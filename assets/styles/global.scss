@@ -109,3 +109,7 @@ button {
     }
   }
 }
+.padding-page{
+  padding-left: max(7rem,calc((100% - 76rem)/2));
+  padding-right: max(7rem,calc((100% - 76rem)/2));
+}
