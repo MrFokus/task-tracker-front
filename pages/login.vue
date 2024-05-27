@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useMyFetch } from "~/composables/myFetch";
 
-const access_token = useCookie('access_token', { maxAge: 360000, secure: true })
+const access_token = useCookie('access_token', { maxAge: 360000})
 const credential = ref<{ login: string, password: string }>({
   login: '',
   password: ''
@@ -26,7 +26,7 @@ async function login() {
 </script>
 
 <template>
-  <form @submit.prevent="login" class="login white-window">
+  <form @submit.prevent="login" class="login white-block">
     <div class="logo">
       <img src="@/assets/img/logo-login.svg" alt="logo" />
       <p>ИнтерПро</p>
@@ -51,6 +51,7 @@ async function login() {
   flex-direction: column;
   gap: 1rem;
   align-items: center;
+  // padding: 1.5rem;
 }
 
 .credential {

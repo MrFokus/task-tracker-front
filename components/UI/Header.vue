@@ -31,6 +31,10 @@
 
 <style scoped lang="scss">
 header {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
     padding-top: 1rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--Gray-200, #EAECF0);

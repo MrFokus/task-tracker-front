@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { IRegister} from '~/interfaces/account';
 
-const access_token = useCookie('access_token', { maxAge: 360000, secure: true })
+const access_token = useCookie('access_token', { maxAge: 360000})
 const registerData = ref<IRegister>({
     login: '',
     mail: '',
@@ -33,7 +33,7 @@ async function register() {
 }</script>
 
 <template>
-    <form @submit.prevent="register" class="login white-window">
+    <form @submit.prevent="register" class="login white-block">
         <div class="logo">
             <img src="@/assets/img/logo-login.svg" alt="logo" />
             <p>ИнтерПро</p>

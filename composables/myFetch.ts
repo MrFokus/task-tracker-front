@@ -1,7 +1,7 @@
 
 export const useMyFetch = async<Type> (request:string, opts?:any)=>{
     const config = useRuntimeConfig()
-    const accessToken = useCookie('access')
+    const accessToken = useCookie('access_token')
     const res = await $fetch<Type>(request, {
         ...opts,
         baseURL: config.public.baseUrl,

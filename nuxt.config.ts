@@ -1,7 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  ssr:false,
+  ssr: false,
+  modules: [
+    '@pinia/nuxt',
+  ],
+  plugins:['~/plugins/crop-content.ts','~/plugins/out-click.ts'],
   css:["@/assets/styles/global.scss"],
   vite: {
     css: {
