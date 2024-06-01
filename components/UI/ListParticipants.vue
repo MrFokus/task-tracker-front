@@ -62,6 +62,7 @@ const props = defineProps<{
 
     .profile {
         cursor: pointer;
+        min-width: 2.5rem;
         height: 100%;
         aspect-ratio: 1/1;
         border-radius: 50%;

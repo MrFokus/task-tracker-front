@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const props = defineProps<{
+    id:number,
     name: string,
     lastUpdate?: Date,
     photo?: string
@@ -7,7 +8,7 @@ const props = defineProps<{
 </script>
 
 <template>
-    <div class="project-card">
+    <nuxt-link :to="`/project/${id}`" class="project-card">
         <img src="https://static.wixstatic.com/media/f47f99_2990d6716f154cabb5ab3f7eea7d55a3~mv2.png" alt=""
             class="preview">
         <div class="info">
@@ -16,7 +17,7 @@ const props = defineProps<{
                 Обновлено 2 часа назад
             </p>
         </div>
-    </div>
+    </nuxt-link>
 </template>
 
 <style scoped lang="scss">

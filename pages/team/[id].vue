@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import EmptyContent from '~/components/UI/EmptyContent.vue';
 import ProjectCard from '~/components/UI/ProjectCard.vue';
 import TitleBase from '~/components/UI/TitleBase.vue';
 
@@ -9,9 +10,7 @@ async function getTeam() {
         let res = await useMyFetch(`/team/${route.params.id}`)
         if (res) {
             team.value = res
-        }
-        console.log(team);
-        
+        }        
     }
     catch (e) {
         
@@ -29,7 +28,7 @@ await getTeam()
             :link-back="{ name: 'Вернуться назад на главную', path: '/' }">
             <div class="team-managements">
                 <button class="settings-team white">Управлять командой</button>
-                <LazyUIListParticipants class="list-participants"></LazyUIListParticipants>
+                <LazyUIListParticipants :list="team.participatesTeam.map((el:any) => ({name:el?.user.name}))??[]" class="list-participants"></LazyUIListParticipants>
             </div>
         </TitleBase>
         <hr>
@@ -81,8 +80,9 @@ await getTeam()
                 </div>
             </div>
             <div v-if="team.projects" class="projects">
-                <ProjectCard :name="project.name" v-for="project in team.projects"></ProjectCard>
+                <ProjectCard :id="project.id" :name="project.name" v-for="project in team.projects"></ProjectCard>
             </div>
+            <EmptyContent v-else description="Проектов пока что нет. <br> Вы можете создать первый проект команды!"></EmptyContent>
             
         </section>
     </main>
