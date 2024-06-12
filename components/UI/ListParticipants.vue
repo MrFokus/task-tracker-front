@@ -1,7 +1,8 @@
 <script setup lang="ts">
 const otherParticipants = ref(0)
 const props = defineProps<{
-    list?:{name:string, photo?:string}[]
+    list?: { name: string, photo?: string }[],
+    moreName?:string
 }>()
 </script>
 
@@ -14,7 +15,7 @@ const props = defineProps<{
         </div>
         <div class="other-container">
             <nuxt-link v-if="otherParticipants">
-                ещё {{ otherParticipants }}
+               {{ moreName?? 'ещё'}} {{ otherParticipants }}
             </nuxt-link>
         </div>
         <slot>
@@ -58,18 +59,6 @@ const props = defineProps<{
         max-width: 100%;
         width: 100%;
         overflow: hidden;
-    }
-
-    .profile {
-        cursor: pointer;
-        min-width: 2.5rem;
-        height: 100%;
-        aspect-ratio: 1/1;
-        border-radius: 50%;
-        border: 1.5px solid white;
-        object-fit: cover;
-        background-color: $gray-100;
-        object-position: center center;
     }
 
     .profile:nth-of-type(n) {

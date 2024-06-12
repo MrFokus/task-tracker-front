@@ -52,7 +52,7 @@ await getProjects()
         <div class="last-projects-container">
             <p class="title">Последние проекты</p>
             <div class="last-projects">
-                <ProjectCard :name="project.name" v-for="project in projects"></ProjectCard>
+                <ProjectCard :id="project.id" :name="project.name" v-for="project in projects"></ProjectCard>
             </div>
         </div>
     </div>

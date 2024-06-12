@@ -1,0 +1,409 @@
+<script setup lang="ts">
+const isNewMark = ref(false)
+const isManagementMarks = ref(false)
+
+const emit = defineEmits<{
+    close: []
+}>()
+const selectStyleForNewMark = ref()
+const colors = [{ text: '#F04438', background: '#FEF3F2' }, { text: '#F79009', background: '#FFFAEB' }, { text: '#12B76A', background: '#ECFDF3' }, { text: '#FDF2FA', background: '#F0F9FF' }, { text: '#667085', background: '#EAECF0' }, { text: '#EE46BC', background: '#FDF2FA' }, { text: '#9E77ED', background: '#F9F5FF' }, { text: '#FB6514', background: '#FFF6ED' }]
+const newMark = ref({
+    name: '',
+    text: '',
+    background: ''
+})
+
+function saveMark() {
+    isNewMark.value = false
+    // Сохранение метки на сервере
+}
+
+watch(selectStyleForNewMark, () => {
+    newMark.value = {
+        name: newMark.value.name,
+        ...colors[selectStyleForNewMark.value]
+    }
+})
+
+
+</script>
+
+
+<template>
+    <header>
+        <button :disabled="!isNewMark && !isManagementMarks" @click="() => { isNewMark = false; isManagementMarks = false}" class="back">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M12.6668 8.00001H3.3335M3.3335 8.00001L8.00016 12.6667M3.3335 8.00001L8.00016 3.33334"
+                    stroke="#667085" stroke-width="1.67" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </button>
+        <p class="name-chapter">{{ isNewMark ? 'Создание метки' : isManagementMarks ? 'Управление метками' : 'Метки'
+            }}</p>
+        <button @click="emit('close')" class="close"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                viewBox="0 0 16 16" fill="none">
+                <path d="M12 4L4 12M4 4L12 12" stroke="#667085" stroke-width="1.66667" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg></button>
+    </header>
+
+    <div v-if="isNewMark" class="content modal-block column new-mark-container">
+        <div class="preview">
+            <div :style="{backgroundColor: newMark.background}" class="mark">
+                <p :style="{color: newMark.text}" class="mark-name">{{ newMark.name }}</p>
+            </div>
+        </div>
+        <input type="text" v-model="newMark.name" class="input-name-mark">
+        <hr>
+        <p class="color-title">Цвет</p>
+        <ul class="colors">
+            <li v-for="(color, i) in colors">
+                <button class="color" @click="selectStyleForNewMark = i" :style="{ backgroundColor: color.text }">
+                    <svg v-if="i == selectStyleForNewMark" xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                        viewBox="0 0 14 14" fill="none">
+                        <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="white" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </li>
+        </ul>
+        <hr>
+        <button @click="saveMark" class="blue">Сохранить метку</button>
+    </div>
+
+    <div v-else class="content column">
+        <ul class="marks column">
+            <li>
+                <button class="mark">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="#2E90FA" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <div class="name-container">
+                        <div class="color">
+
+                        </div>
+                        <p class="mark-name">Высокий приоритет</p>
+                    </div>
+                </button>
+            </li>
+            <li>
+                <button class="mark">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="#2E90FA" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <div class="name-container">
+                        <div class="color">
+
+                        </div>
+                        <p class="mark-name">Высокий приоритет</p>
+                    </div>
+                </button>
+            </li>
+            <li>
+                <button class="mark">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="#2E90FA" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <div class="name-container">
+                        <div class="color">
+
+                        </div>
+                        <p class="mark-name">Высокий приоритет</p>
+                    </div>
+                </button>
+            </li>
+            <li>
+                <button class="mark">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="#2E90FA" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <div class="name-container">
+                        <div class="color">
+
+                        </div>
+                        <p class="mark-name">Высокий приоритет</p>
+                    </div>
+                </button>
+            </li>
+            <li>
+                <button class="mark">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="#2E90FA" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <div class="name-container">
+                        <div class="color">
+
+                        </div>
+                        <p class="mark-name">Высокий приоритет</p>
+                    </div>
+                </button>
+            </li>
+            <li>
+                <button class="mark">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="#2E90FA" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <div class="name-container">
+                        <div class="color">
+
+                        </div>
+                        <p class="mark-name">Высокий приоритет</p>
+                    </div>
+                </button>
+            </li>
+            <li>
+                <button class="mark">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="#2E90FA" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <div class="name-container">
+                        <div class="color">
+
+                        </div>
+                        <p class="mark-name">Высокий приоритет</p>
+                    </div>
+                </button>
+            </li>
+            <li>
+                <button class="mark">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="#2E90FA" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <div class="name-container">
+                        <div class="color">
+
+                        </div>
+                        <p class="mark-name">Высокий приоритет</p>
+                    </div>
+                </button>
+            </li>
+            <li>
+                <button class="mark">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="#2E90FA" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <div class="name-container">
+                        <div class="color">
+
+                        </div>
+                        <p class="mark-name">Высокий приоритет</p>
+                    </div>
+                </button>
+            </li>
+            <li>
+                <button class="mark">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="#2E90FA" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <div class="name-container">
+                        <div class="color">
+
+                        </div>
+                        <p class="mark-name">Высокий приоритет</p>
+                    </div>
+                </button>
+            </li>
+        </ul>
+        <div class="hr-container">
+            <hr>
+        </div>
+        <div class="actions-mark-modal column">
+            <button @click="isNewMark = true" class="add-new-mark">
+                Добавить новую метку...
+            </button>
+            <button class="management-mark">
+                Управление метками
+            </button>
+        </div>
+    </div>
+</template>
+
+
+<style scoped lang="scss">
+    header {
+        width: 100%;
+        padding: 0.125rem;
+        gap: 0.62rem;
+        align-items: center;
+
+        button {
+            padding: 0.375rem;
+
+            &:disabled {
+                opacity: 0;
+            }
+
+        }
+
+        .name-chapter {
+            width: 100%;
+            text-align: center;
+            color: $gray-500;
+            text-align: center;
+            font-family: Inter;
+            font-size: 0.875rem;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 1.25rem;
+        }
+
+    }
+
+    .marks {
+        width: 100%;
+        gap: 0.25rem;
+        max-height: 14rem;
+        overflow: auto;
+
+        li {
+            width: 100%;
+        }
+
+        .mark {
+            &:hover {
+                background-color: $gray-100;
+            }
+
+            width: 100%;
+            padding: 0.375rem 0.25rem 0.375rem 0.75rem;
+            gap: 0.875rem;
+            align-items: center;
+
+            .name-container {
+                gap: 0.5rem;
+                align-items: center;
+
+                .color {
+                    width: 0.5rem;
+                    height: 0.5rem;
+                    border-radius: 62.4375rem;
+                    background: var(--Error-500, #F04438);
+                }
+
+                .mark-name {
+                    color: $gray-500;
+                    font-family: Inter;
+                    font-size: 1rem;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 1.5rem;
+                }
+            }
+        }
+    }
+
+    .hr-container {
+        width: 100%;
+        padding: 0.5rem;
+    }
+
+    hr {
+        border-top: 1px solid $gray-200;
+    }
+
+    .actions-mark-modal {
+        gap: 0.25rem;
+
+        button {
+            padding: 0.375rem 1rem;
+            color: $gray-700;
+
+            /* 16-24, Text M/Medium */
+            font-family: Inter;
+            font-size: 1rem;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 1.5rem;
+
+            /* 150% */
+            &:hover {
+                background-color: $gray-100;
+                border-radius: 0.625rem;
+
+            }
+        }
+    }
+
+    .new-mark-container {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        gap: 0.5rem;
+
+        .preview {
+            padding: 0.75rem;
+            border-radius: 0.625rem;
+
+
+            .mark {
+                border-radius: 0.5rem;
+                width: 100%;
+                height: 1.75rem;
+                background-color: $gray-100;
+                align-items: center;
+                .mark-name {
+                    width: 100%;
+                    overflow: hidden;
+                    text-align: center;
+                    text-overflow: ellipsis;
+                    font-family: Inter;
+                    font-size: 0.875rem;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 1.25rem;
+                }
+            }
+        }
+    }
+
+    .input-name-mark {
+        padding: 0.375rem 0.875rem;
+        border-radius: 0.625rem;
+        color: $gray-900;
+
+        font-family: Inter;
+        font-size: 1rem;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 1.5rem;
+    }
+
+    .color-title {
+        color: $gray-500;
+
+        /* Text sm/Medium */
+        font-family: Inter;
+        font-size: 0.875rem;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 1.25rem;
+        /* 142.857% */
+    }
+
+    .colors {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, 3.5rem);
+        gap: 0.5rem;
+
+        li {
+            height: 1.75rem;
+        }
+
+        .color {
+            width: 100%;
+            height: 100%;
+            border-radius: 0.5rem;
+            align-items: center;
+            justify-content: center;
+
+        }
+    }
+</style>

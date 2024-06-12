@@ -15,7 +15,7 @@
             </svg>
             <p class="name">ИнтерПро</p>
         </nuxt-link>
-        <div class="profile">
+        <div class="profile-header">
             <NuxtLink class="settings" to="#">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path
@@ -60,7 +60,7 @@ header {
             /* 150% */
         }
     }
-    .profile{
+    .profile-header{
         gap: 1rem;
         align-items: center;
         .settings{
