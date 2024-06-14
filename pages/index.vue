@@ -62,7 +62,7 @@ let isCreateProject = ref(false)
                 </ul>
             </div>
         </TitleBase>
-        <EmptyContent v-if="!teams" description="Пока ничего нет. <br> Создайте личный проект или команду!" preview="@/assets/img/empty-emoji.png"></EmptyContent>
+        <EmptyContent v-if="teams && teams.length==0" description="Пока ничего нет. <br> Создайте личный проект или команду!" preview="@/assets/img/empty-emoji.png"></EmptyContent>
         <div v-else class="content-main-page">
             <!-- <section class="personal-projects white-block">
                 <div class="title-container">

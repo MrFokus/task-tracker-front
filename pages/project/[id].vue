@@ -1,20 +1,40 @@
 <script setup lang="ts">
+import { io } from 'socket.io-client';
 import ColumnKanban from '~/components/UI/ColumnKanban.vue';
 import ModalBase from '~/components/UI/ModalBase.vue';
+import { useProjectStore } from '~/store/project';
 
 definePageMeta({
     layout: 'project'
 })
+const token = useCookie('access_token')
+// const {$io} = useNuxtApp()
+const $io = io(useRuntimeConfig().public.baseUrl, {
+    extraHeaders: {
+    Authorization: token.value?token.value :''
+  }
+})
+
+$io.on('connect', () => {
+    console.log('connect');
+    
+})
 const route = useRoute()
-const project = await useMyFetch(`/project/${route.params.id}`)
+// const project = await useMyFetch(`/project/${route.params.id}`)
 const isCreateCard = ref(false)
 const createCardIdColumn = ref<number>()
 const isCreateColumn = ref(false)
 const newColumnInput = ref('')
-console.log(project);
+const projectStore = useProjectStore()
+const project = ref()
+project.value = await projectStore.getProject(route.params.id)
+
+
 if (!project) {
     navigateTo('/')
 }
+
+projectStore.getProject(+route.params.id)
 
 function createCard(columnId: number) {
     isCreateCard.value = true
@@ -26,7 +46,7 @@ async function createColumn() {
         let res = await useMyFetch('/group', {
             method: 'POST',
             body: {
-                projectId: project?.id,
+                projectId: project?.value.id,
                 name: newColumnInput.value.trim()
             }
         })
@@ -34,6 +54,25 @@ async function createColumn() {
         isCreateColumn.value = false
     }
 }
+
+$io.emit('createRoom',{id:+route.params.id}, (e) => {
+    console.log(e);
+    
+})
+$io.on('createRoom', (e) => {
+    console.log(e);
+    
+})
+$io.on('refresh', async (e) => {
+    project.value = await projectStore.getProject(project.value.id)
+    
+    
+})
+$io.on('error', (e) => {
+    console.error(e);
+    
+})
+
 
 </script>
 

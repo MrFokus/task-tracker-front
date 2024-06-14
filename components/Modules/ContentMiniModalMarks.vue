@@ -4,7 +4,8 @@ const isManagementMarks = ref(false)
 const refactMark = ref()
 
 const emit = defineEmits<{
-    close: []
+    close: [],
+    setMark:[any[]]
 }>()
 const route = useRoute()
 const selectStyleForNewMark = ref()
@@ -14,6 +15,7 @@ const newMark = ref({
     text: '',
     background: ''
 })
+
 
 async function saveMark() {
     isNewMark.value = false
@@ -35,6 +37,7 @@ const marksProject = await useMyFetch('/mark', {
     }
 })
 
+const markTask = ref([])
 
 watch(selectStyleForNewMark, () => {
     newMark.value = {
@@ -42,6 +45,19 @@ watch(selectStyleForNewMark, () => {
         ...colors[selectStyleForNewMark.value]
     }
 })
+
+function addMark(mark: any) {   
+    let indexMark = markTask.value.findIndex((el) => JSON.stringify(el) == JSON.stringify(mark))
+    console.log(indexMark);
+     
+    if (indexMark!==-1) {
+        markTask.value.splice(indexMark,1)
+    }
+    else {
+        markTask.value.push(mark)
+    }
+    emit('setMark', markTask.value)
+}
 
 
 
@@ -111,8 +127,8 @@ watch(selectStyleForNewMark, () => {
     <div v-else class="content column">
         <ul class="marks column">
             <li v-for="mark in marksProject">
-                <button class="mark">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <button @click="addMark(mark)" class="mark">
+                    <svg v-if="markTask.findIndex(el=> el.id === mark.id) !== -1" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
                         <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="#2E90FA" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round" />
                     </svg>

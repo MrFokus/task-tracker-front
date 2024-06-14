@@ -8,6 +8,7 @@ const props = defineProps<{
 }>()
 
 const isSetMark = ref(false)
+const isSetParticipants = ref(false)
 
 const formData = ref({
     taskName: '',
@@ -20,6 +21,13 @@ const formData = ref({
     attachment: [],
 
 })
+
+
+function setMark(marks: any[]) {
+    formData.value.mark = marks
+    console.log(formData.value);
+
+}
 
 const emit = defineEmits<{
     close: []
@@ -65,13 +73,19 @@ function textareaResize(e: any) {
                 <div class="info-element-container">
                     <p class="name">Ответственные</p>
                     <div class="content-container">
-                        <button class="grey">Указать</button>
+                        <button @click="isSetParticipants = true" class="grey">Указать</button>
                     </div>
                 </div>
                 <div class="info-element-container">
                     <p class="name">Колонка</p>
                     <div class="content-container">
                         <button class="grey">Указать</button>
+                    </div>
+                </div>
+                <div class="info-element-container">
+                    <p class="name">Ярлык</p>
+                    <div class="content-container">
+                        <input class="add-label" type="text">
                     </div>
                 </div>
             </section>
@@ -85,9 +99,19 @@ function textareaResize(e: any) {
         <footer class="modal-block">
             <button class="blue save">Сохранить</button>
         </footer>
-    <MiniModal v-if="isSetMark" @close="isSetMark = false">
-        <ModulesContentMiniModalMarks @close="isSetMark = false"></ModulesContentMiniModalMarks>
-    </MiniModal>
+        <MiniModal v-if="isSetMark" @close="isSetMark = false">
+            <ModulesContentMiniModalMarks @set-mark="setMark" @close="isSetMark = false"></ModulesContentMiniModalMarks>
+        </MiniModal>
+        <MiniModal v-if="isSetParticipants" @close="isSetParticipants = false">
+            <ul class="users-team">
+                <li v-for="user in usersTeam">
+                    <button>
+                        <img src="" alt="">
+                        <p class="name"></p>
+                    </button>
+                </li>
+            </ul>
+        </MiniModal>
     </form>
 </template>
 
@@ -213,6 +237,20 @@ function textareaResize(e: any) {
             font-style: normal;
             font-weight: 600;
             line-height: 1.25rem;
+        }
+    }
+
+    .add-label {
+        padding: 0;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        line-height: 1.25rem;
+        color: $gray-700;
+        background-color: $gray-100;
+
+        &:focus {
+            background-color: #fff;
         }
     }
 </style>

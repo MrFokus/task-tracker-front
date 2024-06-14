@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   modules: [
     '@pinia/nuxt',
   ],
-  plugins:['~/plugins/crop-content.ts','~/plugins/out-click.ts'],
+  plugins:['~/plugins/crop-content.ts','~/plugins/out-click.ts','~/plugins/socket.ts'],
   css:["@/assets/styles/global.scss"],
   vite: {
     css: {
