@@ -56,7 +56,7 @@ let isCreateProject = ref(false)
                     </li>
                     <li>
                         <button @click="isCreateProject = true" class="select-item">
-                            Создать личный проект
+                            Создать проект
                         </button>
                     </li>
                 </ul>
@@ -64,7 +64,7 @@ let isCreateProject = ref(false)
         </TitleBase>
         <EmptyContent v-if="!teams" description="Пока ничего нет. <br> Создайте личный проект или команду!" preview="@/assets/img/empty-emoji.png"></EmptyContent>
         <div v-else class="content-main-page">
-            <section class="personal-projects white-block">
+            <!-- <section class="personal-projects white-block">
                 <div class="title-container">
                     <p class="team-name">
                         Личные проекты
@@ -78,15 +78,15 @@ let isCreateProject = ref(false)
                 <div class="last-projects-container">
                     <p class="title">Последние проекты</p>
                     <div v-crop-content class="last-projects">
-                        <!-- <ProjectCard></ProjectCard>
                         <ProjectCard></ProjectCard>
                         <ProjectCard></ProjectCard>
                         <ProjectCard></ProjectCard>
                         <ProjectCard></ProjectCard>
-                        <ProjectCard></ProjectCard> -->
+                        <ProjectCard></ProjectCard>
+                        <ProjectCard></ProjectCard>
                     </div>
                 </div>
-            </section>
+            </section> -->
             <section class="teams">
                 <div v-for="team in teams" class="team white-block">
                     <TeamContent :users="team.users" :team-id="team.teamId" :team-name="team.teamName">

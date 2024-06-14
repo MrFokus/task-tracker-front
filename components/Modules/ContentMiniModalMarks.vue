@@ -1,10 +1,12 @@
 <script setup lang="ts">
 const isNewMark = ref(false)
 const isManagementMarks = ref(false)
+const refactMark = ref()
 
 const emit = defineEmits<{
     close: []
 }>()
+const route = useRoute()
 const selectStyleForNewMark = ref()
 const colors = [{ text: '#F04438', background: '#FEF3F2' }, { text: '#F79009', background: '#FFFAEB' }, { text: '#12B76A', background: '#ECFDF3' }, { text: '#FDF2FA', background: '#F0F9FF' }, { text: '#667085', background: '#EAECF0' }, { text: '#EE46BC', background: '#FDF2FA' }, { text: '#9E77ED', background: '#F9F5FF' }, { text: '#FB6514', background: '#FFF6ED' }]
 const newMark = ref({
@@ -13,10 +15,26 @@ const newMark = ref({
     background: ''
 })
 
-function saveMark() {
+async function saveMark() {
     isNewMark.value = false
-    // Сохранение метки на сервере
+    let res = await useMyFetch('/mark', {
+        method: "POST",
+        body:{
+            name: newMark.value.name,
+            color: newMark.value.text,
+            background: newMark.value.background,
+            projectId: +route.params.id
+        }
+    }) 
+    console.log(res);
+    
 }
+const marksProject = await useMyFetch('/mark', {
+    query: {
+        projectId: +route.params.id
+    }
+})
+
 
 watch(selectStyleForNewMark, () => {
     newMark.value = {
@@ -26,18 +44,20 @@ watch(selectStyleForNewMark, () => {
 })
 
 
+
 </script>
 
 
 <template>
     <header>
-        <button :disabled="!isNewMark && !isManagementMarks" @click="() => { isNewMark = false; isManagementMarks = false}" class="back">
+        <button :disabled="!isNewMark && !isManagementMarks"
+            @click="() => { isNewMark = false; isManagementMarks = false }" class="back">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M12.6668 8.00001H3.3335M3.3335 8.00001L8.00016 12.6667M3.3335 8.00001L8.00016 3.33334"
                     stroke="#667085" stroke-width="1.67" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
         </button>
-        <p class="name-chapter">{{ isNewMark ? 'Создание метки' : isManagementMarks ? 'Управление метками' : 'Метки'
+        <p class="name-chapter">{{ isNewMark ? 'Создание метки' : isManagementMarks ? 'Управление метками' : refactMark? 'Редактирование метки' : 'Метки'
             }}</p>
         <button @click="emit('close')" class="close"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                 viewBox="0 0 16 16" fill="none">
@@ -46,10 +66,10 @@ watch(selectStyleForNewMark, () => {
             </svg></button>
     </header>
 
-    <div v-if="isNewMark" class="content modal-block column new-mark-container">
+    <div v-if="isNewMark || refactMark" class="content modal-block column new-mark-container">
         <div class="preview">
-            <div :style="{backgroundColor: newMark.background}" class="mark">
-                <p :style="{color: newMark.text}" class="mark-name">{{ newMark.name }}</p>
+            <div :style="{ backgroundColor: newMark.background }" class="mark">
+                <p :style="{ color: newMark.text }" class="mark-name">{{ newMark.name }}</p>
             </div>
         </div>
         <input type="text" v-model="newMark.name" class="input-name-mark">
@@ -70,145 +90,37 @@ watch(selectStyleForNewMark, () => {
         <button @click="saveMark" class="blue">Сохранить метку</button>
     </div>
 
+    <div v-else-if="isManagementMarks" class="content column  management-mark-container">
+        <ul class="marks column">
+            <li v-for="mark in marksProject">
+                <div class="mark">
+                    <div class="name-container">
+                        <div :style="{backgroundColor:mark.color??''}" class="color">
+
+                        </div>
+                        <p class="mark-name">{{mark.name}}</p>
+                    </div>
+                    <div class="actions">
+                        <button @click="refactMark=1" ><img src="@/assets/img/edit-02.svg" alt=""></button>
+                        <button><img src="@/assets/img/trash-02.svg" alt=""></button>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
     <div v-else class="content column">
         <ul class="marks column">
-            <li>
+            <li v-for="mark in marksProject">
                 <button class="mark">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
                         <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="#2E90FA" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                     <div class="name-container">
-                        <div class="color">
+                        <div :style="{backgroundColor:mark.color??''}" class="color">
 
                         </div>
-                        <p class="mark-name">Высокий приоритет</p>
-                    </div>
-                </button>
-            </li>
-            <li>
-                <button class="mark">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="#2E90FA" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    <div class="name-container">
-                        <div class="color">
-
-                        </div>
-                        <p class="mark-name">Высокий приоритет</p>
-                    </div>
-                </button>
-            </li>
-            <li>
-                <button class="mark">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="#2E90FA" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    <div class="name-container">
-                        <div class="color">
-
-                        </div>
-                        <p class="mark-name">Высокий приоритет</p>
-                    </div>
-                </button>
-            </li>
-            <li>
-                <button class="mark">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="#2E90FA" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    <div class="name-container">
-                        <div class="color">
-
-                        </div>
-                        <p class="mark-name">Высокий приоритет</p>
-                    </div>
-                </button>
-            </li>
-            <li>
-                <button class="mark">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="#2E90FA" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    <div class="name-container">
-                        <div class="color">
-
-                        </div>
-                        <p class="mark-name">Высокий приоритет</p>
-                    </div>
-                </button>
-            </li>
-            <li>
-                <button class="mark">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="#2E90FA" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    <div class="name-container">
-                        <div class="color">
-
-                        </div>
-                        <p class="mark-name">Высокий приоритет</p>
-                    </div>
-                </button>
-            </li>
-            <li>
-                <button class="mark">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="#2E90FA" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    <div class="name-container">
-                        <div class="color">
-
-                        </div>
-                        <p class="mark-name">Высокий приоритет</p>
-                    </div>
-                </button>
-            </li>
-            <li>
-                <button class="mark">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="#2E90FA" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    <div class="name-container">
-                        <div class="color">
-
-                        </div>
-                        <p class="mark-name">Высокий приоритет</p>
-                    </div>
-                </button>
-            </li>
-            <li>
-                <button class="mark">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="#2E90FA" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    <div class="name-container">
-                        <div class="color">
-
-                        </div>
-                        <p class="mark-name">Высокий приоритет</p>
-                    </div>
-                </button>
-            </li>
-            <li>
-                <button class="mark">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="#2E90FA" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    <div class="name-container">
-                        <div class="color">
-
-                        </div>
-                        <p class="mark-name">Высокий приоритет</p>
+                        <p class="mark-name">{{mark.name}}</p>
                     </div>
                 </button>
             </li>
@@ -220,7 +132,7 @@ watch(selectStyleForNewMark, () => {
             <button @click="isNewMark = true" class="add-new-mark">
                 Добавить новую метку...
             </button>
-            <button class="management-mark">
+            <button @click="isManagementMarks = true" class="management-mark">
                 Управление метками
             </button>
         </div>
@@ -277,6 +189,9 @@ watch(selectStyleForNewMark, () => {
             padding: 0.375rem 0.25rem 0.375rem 0.75rem;
             gap: 0.875rem;
             align-items: center;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
 
             .name-container {
                 gap: 0.5rem;
@@ -349,6 +264,7 @@ watch(selectStyleForNewMark, () => {
                 height: 1.75rem;
                 background-color: $gray-100;
                 align-items: center;
+
                 .mark-name {
                     width: 100%;
                     overflow: hidden;
@@ -404,6 +320,26 @@ watch(selectStyleForNewMark, () => {
             align-items: center;
             justify-content: center;
 
+        }
+    }
+
+    .management-mark-container {
+        .mark {
+            justify-content: space-between;
+            align-items: center;
+            &:hover{
+                background: unset;
+            }
+            .actions {
+                gap: 0.5rem;
+                button{
+                    border-radius: 0.625rem;
+                    padding: 0.375rem;
+                    &:hover{
+                        background-color: $gray-100;
+                    }
+                }
+            }
         }
     }
 </style>

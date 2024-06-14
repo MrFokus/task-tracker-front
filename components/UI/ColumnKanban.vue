@@ -6,6 +6,24 @@ const props = defineProps<{
     name: string,
 }>()
 
+const DEFAULT_COLUMN = {
+    'Запланировано': {
+        icon: '/to-continue.svg',
+        background: '#EAECF0',
+        color: '#344054',
+    },
+    'В работе': {
+        icon: '/in-work-status.svg',
+        background: '#E8EFFB',
+        color: '#175CD3',
+    },
+    'Выполнено':{
+        icon: '/success-icon.svg',
+        background: '#E6F2ED',
+        color: '#027A48',
+    }
+}
+
 const emit = defineEmits<{
     createCard:[number]
 }>()
@@ -14,9 +32,9 @@ const emit = defineEmits<{
 <template>
     <div class="group-kanban column">
         <div class="container-column-name">
-            <div class="column-name">
-                <img src="@/assets/img/status-icons.svg" alt="">
-                <p class="name">{{ name }}</p>
+            <div :style="{backgroundColor:DEFAULT_COLUMN[name]?.background ?? 'transparent',border:DEFAULT_COLUMN[name]?'':'1px solid #D0D5DD'}" class="column-name">
+                <img :src="DEFAULT_COLUMN[name]?.icon ?? '/dashed-icon.svg'" alt="">
+                <p :style="{color:DEFAULT_COLUMN[name]?.color ?? '#344054'}" class="name">{{ name }}</p>
             </div>
         </div>
         <div class="content column">
