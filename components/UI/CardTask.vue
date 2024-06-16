@@ -11,9 +11,7 @@ import ListParticipants from './ListParticipants.vue';
         </header>
         <div class="card-content column">
             <div class="mark-block">
-                <p :style="{ color: '#B42318', backgroundColor: '#FEF3F2' }" class="mark">
-                    Высокий приоритет
-                </p>
+                
                 <p :style="{ color: '#B54708', backgroundColor: '#FFFAEB' }" class="mark">
                     Срочно
                 </p>
@@ -119,9 +117,9 @@ import ListParticipants from './ListParticipants.vue';
     .mark-block {
         flex-wrap: wrap;
         gap: 0.5rem;
-        .mark {
-            white-space: nowrap;
-        }
+        // .mark {
+        //     white-space: nowrap;
+        // }
     }
 
     .profile:nth-of-type(n) {

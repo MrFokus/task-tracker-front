@@ -1,15 +1,21 @@
 <script setup lang="ts">
+import { useProjectStore } from '~/store/project';
+
 const isNewMark = ref(false)
 const isManagementMarks = ref(false)
 const refactMark = ref()
 
 const emit = defineEmits<{
     close: [],
-    setMark:[any[]]
+    setMark: [any[]]
+}>()
+
+const props = defineProps<{
+    marksProject:any[]
 }>()
 const route = useRoute()
 const selectStyleForNewMark = ref()
-const colors = [{ text: '#F04438', background: '#FEF3F2' }, { text: '#F79009', background: '#FFFAEB' }, { text: '#12B76A', background: '#ECFDF3' }, { text: '#FDF2FA', background: '#F0F9FF' }, { text: '#667085', background: '#EAECF0' }, { text: '#EE46BC', background: '#FDF2FA' }, { text: '#9E77ED', background: '#F9F5FF' }, { text: '#FB6514', background: '#FFF6ED' }]
+const colors = [{ text: '#F04438', background: '#FEF3F2' }, { text: '#F79009', background: '#FFFAEB' }, { text: '#12B76A', background: '#ECFDF3' }, { text: '#0BA5EC', background: '#F0F9FF' }, { text: '#667085', background: '#EAECF0' }, { text: '#EE46BC', background: '#FDF2FA' }, { text: '#9E77ED', background: '#F9F5FF' }, { text: '#FB6514', background: '#FFF6ED' }]
 const newMark = ref({
     name: '',
     text: '',
@@ -21,23 +27,28 @@ async function saveMark() {
     isNewMark.value = false
     let res = await useMyFetch('/mark', {
         method: "POST",
-        body:{
+        body: {
             name: newMark.value.name,
             color: newMark.value.text,
             background: newMark.value.background,
             projectId: +route.params.id
         }
-    }) 
-    console.log(res);
-    
-}
-const marksProject = await useMyFetch('/mark', {
-    query: {
-        projectId: +route.params.id
+    })
+    newMark.value = {
+        name: '',
+        text: '',
+        background: ''
     }
-})
 
-const markTask = ref([])
+}
+// const project = useProjectStore()
+// const marksProject = ref()
+
+// watch(project, () => {
+//     marksProject.value = project.marks
+
+// }, { immediate: true, deep: true })
+const markTask = defineModel()
 
 watch(selectStyleForNewMark, () => {
     newMark.value = {
@@ -46,12 +57,12 @@ watch(selectStyleForNewMark, () => {
     }
 })
 
-function addMark(mark: any) {   
+function addMark(mark: any) {
     let indexMark = markTask.value.findIndex((el) => JSON.stringify(el) == JSON.stringify(mark))
     console.log(indexMark);
-     
-    if (indexMark!==-1) {
-        markTask.value.splice(indexMark,1)
+
+    if (indexMark !== -1) {
+        markTask.value.splice(indexMark, 1)
     }
     else {
         markTask.value.push(mark)
@@ -59,6 +70,13 @@ function addMark(mark: any) {
     emit('setMark', markTask.value)
 }
 
+async function deleteMark(id: number) {
+    let res = await useMyFetch(`/mark/${id}`, {
+        method: "DELETE"
+    })
+    console.log(res);
+
+}
 
 
 </script>
@@ -73,7 +91,8 @@ function addMark(mark: any) {
                     stroke="#667085" stroke-width="1.67" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
         </button>
-        <p class="name-chapter">{{ isNewMark ? 'Создание метки' : isManagementMarks ? 'Управление метками' : refactMark? 'Редактирование метки' : 'Метки'
+        <p class="name-chapter">{{ isNewMark ? 'Создание метки' : isManagementMarks ? 'Управление метками' : refactMark ?
+            'Редактирование метки' : 'Метки'
             }}</p>
         <button @click="emit('close')" class="close"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                 viewBox="0 0 16 16" fill="none">
@@ -111,14 +130,14 @@ function addMark(mark: any) {
             <li v-for="mark in marksProject">
                 <div class="mark">
                     <div class="name-container">
-                        <div :style="{backgroundColor:mark.color??''}" class="color">
+                        <div :style="{ backgroundColor: mark.color ?? '' }" class="color">
 
                         </div>
-                        <p class="mark-name">{{mark.name}}</p>
+                        <p class="mark-name">{{ mark.name }}</p>
                     </div>
                     <div class="actions">
-                        <button @click="refactMark=1" ><img src="@/assets/img/edit-02.svg" alt=""></button>
-                        <button><img src="@/assets/img/trash-02.svg" alt=""></button>
+                        <button @click="refactMark = 1"><img src="@/assets/img/edit-02.svg" alt=""></button>
+                        <button @click="deleteMark(mark.id)"><img src="@/assets/img/trash-02.svg" alt=""></button>
                     </div>
                 </div>
             </li>
@@ -128,15 +147,16 @@ function addMark(mark: any) {
         <ul class="marks column">
             <li v-for="mark in marksProject">
                 <button @click="addMark(mark)" class="mark">
-                    <svg v-if="markTask.findIndex(el=> el.id === mark.id) !== -1" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <svg v-if="markTask.findIndex(el => el.id === mark.id) !== -1" xmlns="http://www.w3.org/2000/svg"
+                        width="14" height="14" viewBox="0 0 14 14" fill="none">
                         <path d="M11.6663 3.5L5.24967 9.91667L2.33301 7" stroke="#2E90FA" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                     <div class="name-container">
-                        <div :style="{backgroundColor:mark.color??''}" class="color">
+                        <div :style="{ backgroundColor: mark.color ?? '' }" class="color">
 
                         </div>
-                        <p class="mark-name">{{mark.name}}</p>
+                        <p class="mark-name">{{ mark.name }}</p>
                     </div>
                 </button>
             </li>
@@ -202,6 +222,7 @@ function addMark(mark: any) {
             }
 
             width: 100%;
+            max-width: 100%;
             padding: 0.375rem 0.25rem 0.375rem 0.75rem;
             gap: 0.875rem;
             align-items: center;
@@ -209,9 +230,18 @@ function addMark(mark: any) {
             white-space: nowrap;
             overflow: hidden;
 
+            svg {
+                min-width: fit-content;
+            }
+
             .name-container {
+                // display: grid;
+                // grid-template-columns: auto 1fr 1fr;
                 gap: 0.5rem;
                 align-items: center;
+                max-width: 100%;
+                width: 100%;
+
 
                 .color {
                     width: 0.5rem;
@@ -221,6 +251,10 @@ function addMark(mark: any) {
                 }
 
                 .mark-name {
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    max-width: 80%;
                     color: $gray-500;
                     font-family: Inter;
                     font-size: 1rem;
@@ -228,6 +262,7 @@ function addMark(mark: any) {
                     font-weight: 500;
                     line-height: 1.5rem;
                 }
+
             }
         }
     }
@@ -343,15 +378,27 @@ function addMark(mark: any) {
         .mark {
             justify-content: space-between;
             align-items: center;
-            &:hover{
+
+            &:hover {
                 background: unset;
             }
+
+            .name-container {
+                max-width: 65% !important;
+
+                .mark-name {
+                    max-width: 80%;
+                }
+            }
+
             .actions {
                 gap: 0.5rem;
-                button{
+
+                button {
                     border-radius: 0.625rem;
                     padding: 0.375rem;
-                    &:hover{
+
+                    &:hover {
                         background-color: $gray-100;
                     }
                 }

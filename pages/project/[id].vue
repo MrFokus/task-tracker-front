@@ -22,7 +22,7 @@ $io.on('connect', () => {
 const route = useRoute()
 // const project = await useMyFetch(`/project/${route.params.id}`)
 const isCreateCard = ref(false)
-const createCardIdColumn = ref<number>()
+const createCardColumn = ref()
 const isCreateColumn = ref(false)
 const newColumnInput = ref('')
 const projectStore = useProjectStore()
@@ -36,9 +36,9 @@ if (!project) {
 
 projectStore.getProject(+route.params.id)
 
-function createCard(columnId: number) {
+function createCard(column: number) {
     isCreateCard.value = true
-    createCardIdColumn.value = columnId
+    createCardColumn.value = column
 }
 
 async function createColumn() {
@@ -53,6 +53,13 @@ async function createColumn() {
         console.log(res);
         isCreateColumn.value = false
     }
+}
+async function deleteColumn(id:number) {
+    let res = await useMyFetch(`/group/${id}`, {
+        method: "DELETE",
+    })
+    console.log(res);
+    
 }
 
 $io.emit('createRoom',{id:+route.params.id}, (e) => {
@@ -78,8 +85,8 @@ $io.on('error', (e) => {
 
 <template>
     <div class="kanban-component">
-        <ModalBase @close="isCreateCard = false" v-if="isCreateCard && createCardIdColumn">
-            <ModulesContentModalCreateCard @close="isCreateCard = false" :project-name="project?.name" />
+        <ModalBase @close="isCreateCard = false" v-if="isCreateCard && createCardColumn">
+            <ModulesContentModalCreateCard :group="createCardColumn" @close="isCreateCard = false" :project-name="project?.name" />
         </ModalBase>
         <ModalBase v-if="isCreateColumn" @close="isCreateColumn = false">
             <form @submit.prevent="" class="create-column white-block column">
@@ -98,7 +105,7 @@ $io.on('error', (e) => {
             </form>
         </ModalBase>
         <div v-if="project.groups.length" class="kanban">
-            <ColumnKanban @create-card="createCard" :id="column.id" :name="column.name"
+            <ColumnKanban @delete="deleteColumn" @create-card="createCard" :id="column.id" :name="column.name"
                 v-for="column in project.groups"></ColumnKanban>
             <div class="group-kanban column">
                 <div class="container-column-name">

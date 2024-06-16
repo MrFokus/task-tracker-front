@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { DEFAULT_COLUMN } from '~/constants/project';
 import CardTask from './CardTask.vue';
 
 const props = defineProps<{
@@ -6,40 +7,30 @@ const props = defineProps<{
     name: string,
 }>()
 
-const DEFAULT_COLUMN = {
-    'Запланировано': {
-        icon: '/to-continue.svg',
-        background: '#EAECF0',
-        color: '#344054',
-    },
-    'В работе': {
-        icon: '/in-work-status.svg',
-        background: '#E8EFFB',
-        color: '#175CD3',
-    },
-    'Выполнено':{
-        icon: '/success-icon.svg',
-        background: '#E6F2ED',
-        color: '#027A48',
-    }
-}
+
 
 const emit = defineEmits<{
-    createCard:[number]
+    createCard: [{
+        id: number,
+        name: string,
+    }],
+    delete: [number]
 }>()
 </script>
 
 <template>
     <div class="group-kanban column">
-        <div class="container-column-name">
-            <div :style="{backgroundColor:DEFAULT_COLUMN[name]?.background ?? 'transparent',border:DEFAULT_COLUMN[name]?'':'1px solid #D0D5DD'}" class="column-name">
+        <div :class="['container-column-name', DEFAULT_COLUMN[name] ? 'no-delete' : '']">
+            <div :style="{ backgroundColor: DEFAULT_COLUMN[name]?.background ?? 'transparent', outline: DEFAULT_COLUMN[name] ? '' : '1px solid #D0D5DD' }"
+                :class="['column-name']">
                 <img :src="DEFAULT_COLUMN[name]?.icon ?? '/dashed-icon.svg'" alt="">
-                <p :style="{color:DEFAULT_COLUMN[name]?.color ?? '#344054'}" class="name">{{ name }}</p>
+                <p :style="{ color: DEFAULT_COLUMN[name]?.color ?? '#344054' }" class="name">{{ name }}</p>
             </div>
+            <button @click="emit('delete', id)" class="delete">Удалить</button>
         </div>
         <div class="content column">
             <!-- <CardTask /> -->
-            <button @click="emit('createCard',id)" class="grey-button">
+            <button @click="emit('createCard', { id,name })" class="grey-button">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M10.0001 4.16666V15.8333M4.16675 9.99999H15.8334" stroke="#667085" stroke-width="1.67"
                         stroke-linecap="round" stroke-linejoin="round" />
@@ -72,6 +63,36 @@ const emit = defineEmits<{
         right: 0;
         left: 0;
         background-color: $gray-50;
+
+        .delete {
+            display: none;
+            background-color: #F04438;
+            color: white;
+            width: fit-content;
+            gap: 0.38rem;
+            border-radius: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            align-items: center;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            font-size: 1rem;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 1.25rem;
+        }
+
+        &:not(.no-delete):hover {
+            .column-name {
+                display: none;
+            }
+
+            .delete {
+                display: flex;
+            }
+
+        }
+
     }
 
 

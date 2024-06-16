@@ -1,35 +1,37 @@
 <script setup lang="ts">
 import ListParticipants from '~/components/UI/ListParticipants.vue';
+import { useProjectStore } from '~/store/project';
 
+const project = useProjectStore()
 </script>
 
 <template>
   <header class="column">
     <div class="path-indicator">
       <div class="path-element">
-        <nuxt-link to="#" class="name">Команда Тигров</nuxt-link>
+        <nuxt-link :to="`/team/${project.teams[0]?.id}`" class="name">{{project.teams[0]?.name}}</nuxt-link>
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
           <path d="M5.83337 18.3333L14.1667 1.66667" stroke="#D0D5DD" stroke-width="2" stroke-linecap="round"
             stroke-linejoin="round" />
         </svg>
       </div>
       <p class="path-element">
-        <span class="name current">Проект «Задачница»</span>
+        <span class="name current">{{project?.name}}</span>
       </p>
     </div>
     <div class="project-info-and-actions">
       <div class="title-block">
-        <h1>Проект «Задачница»</h1>
+        <h1>{{project?.name}}</h1>
         <div class="participants">
           <ListParticipants class="list-participants"
-            :list="[{ name: 'undefined' }, { name: 'undefined' }, { name: 'undefined' }, { name: 'undefined' }, { name: 'undefined' }, { name: 'undefined' }, { name: 'undefined' }]">
+            :list="project.users">
           </ListParticipants>
-          <button class="white add">
+          <!-- <button class="white add">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
               <path d="M9.99996 4.16667V15.8333M4.16663 10H15.8333" stroke="#667085" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round" />
             </svg>
-          </button>
+          </button> -->
         </div>
       </div>
       <div class="actions">

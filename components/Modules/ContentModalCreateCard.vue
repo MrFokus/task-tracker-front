@@ -1,32 +1,40 @@
 <script setup lang="ts">
+import { useProjectStore } from '~/store/project';
+import Mark from '../UI/Mark.vue';
 import MiniModal from '../UI/MiniModal.vue';
+import ContentMiniModalAddParticipants from './ContentMiniModalAddParticipants.vue';
+import ContentMiniModalAddColumn from './ContentMiniModalAddColumn.vue';
+import { DEFAULT_COLUMN } from '~/constants/project';
+import TaskCheckList from '../UI/TaskCheckList.vue';
 
-
+const project = useProjectStore()
 const props = defineProps<{
     projectName: string,
-    columnId?: number,
+    group?: any,
 }>()
 
 const isSetMark = ref(false)
 const isSetParticipants = ref(false)
+const isSetColumn = ref(false)
+const isAddCheckList=ref(false)
 
 const formData = ref({
     taskName: '',
     description: '',
     dateEnd: '',
-    mark: [],
-    participates: [],
-    columnId: props.columnId,
+    marks: [],
+    participants: [],
+    group: props.group,
     checkList: [],
     attachment: [],
+    label: ''
 
 })
 
 
 function setMark(marks: any[]) {
-    formData.value.mark = marks
+    formData.value.marks = marks
     console.log(formData.value);
-
 }
 
 const emit = defineEmits<{
@@ -67,50 +75,127 @@ function textareaResize(e: any) {
                 <div class="info-element-container">
                     <p class="name">Метка</p>
                     <div class="content-container">
-                        <button @click="isSetMark = true" class="grey">Указать</button>
+                        <ul v-if="formData.marks.length">
+                            <li v-for="mark in formData.marks">
+                                <Mark class="mark" :color="mark.color" :background="mark.background"
+                                    :name="mark.name" />
+                            </li>
+                            <li>
+                                <button @click="isSetMark = true" class="add white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"
+                                        fill="none">
+                                        <g clip-path="url(#clip0_0_2708)">
+                                            <path
+                                                d="M12.0003 6.66671L9.33368 4.00004M1.66699 14.3334L3.92324 14.0827C4.1989 14.0521 4.33673 14.0367 4.46556 13.995C4.57985 13.958 4.68862 13.9058 4.78892 13.8396C4.90196 13.7651 5.00002 13.667 5.19614 13.4709L14.0003 4.66671C14.7367 3.93033 14.7367 2.73642 14.0003 2.00004C13.264 1.26366 12.0701 1.26366 11.3337 2.00004L2.52948 10.8042C2.33336 11.0003 2.2353 11.0984 2.16075 11.2114C2.09461 11.3117 2.04234 11.4205 2.00533 11.5348C1.96363 11.6636 1.94831 11.8015 1.91769 12.0771L1.66699 14.3334Z"
+                                                stroke="#667085" stroke-width="1.67" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                        </g>
+                                        <defs>
+                                            <clipPath id="clip0_0_2708">
+                                                <rect width="16" height="16" fill="white" />
+                                            </clipPath>
+                                        </defs>
+                                    </svg>
+                                </button>
+                            </li>
+                        </ul>
+                        <button v-else @click="isSetMark = true" class="add grey">Указать</button>
                     </div>
+
                 </div>
                 <div class="info-element-container">
                     <p class="name">Ответственные</p>
                     <div class="content-container">
-                        <button @click="isSetParticipants = true" class="grey">Указать</button>
+                        <ul v-if="formData.participants.length">
+                            <li v-for="participants in formData.participants">
+                                <nuxt-link class="grey">{{ participants.name }}</nuxt-link>
+                            </li>
+                            <li>
+                                <button @click="isSetParticipants = true" class="add white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"
+                                        fill="none">
+                                        <g clip-path="url(#clip0_0_2708)">
+                                            <path
+                                                d="M12.0003 6.66671L9.33368 4.00004M1.66699 14.3334L3.92324 14.0827C4.1989 14.0521 4.33673 14.0367 4.46556 13.995C4.57985 13.958 4.68862 13.9058 4.78892 13.8396C4.90196 13.7651 5.00002 13.667 5.19614 13.4709L14.0003 4.66671C14.7367 3.93033 14.7367 2.73642 14.0003 2.00004C13.264 1.26366 12.0701 1.26366 11.3337 2.00004L2.52948 10.8042C2.33336 11.0003 2.2353 11.0984 2.16075 11.2114C2.09461 11.3117 2.04234 11.4205 2.00533 11.5348C1.96363 11.6636 1.94831 11.8015 1.91769 12.0771L1.66699 14.3334Z"
+                                                stroke="#667085" stroke-width="1.67" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                        </g>
+                                        <defs>
+                                            <clipPath id="clip0_0_2708">
+                                                <rect width="16" height="16" fill="white" />
+                                            </clipPath>
+                                        </defs>
+                                    </svg>
+                                </button>
+                            </li>
+                        </ul>
+                        <button v-else @click="isSetParticipants = true" class="add grey">Указать</button>
                     </div>
                 </div>
                 <div class="info-element-container">
                     <p class="name">Колонка</p>
                     <div class="content-container">
-                        <button class="grey">Указать</button>
+                        <div :style="{ backgroundColor: DEFAULT_COLUMN[formData.group.name]?.background ?? 'transparent', outline: DEFAULT_COLUMN[formData.group.name] ? '' : '1px solid #D0D5DD' }"
+                            :class="['column-name']">
+                            <img :src="DEFAULT_COLUMN[formData.group.name]?.icon ?? '/dashed-icon.svg'" alt="">
+                            <p :style="{ color: DEFAULT_COLUMN[formData.group.name]?.color ?? '#344054' }" class="name">
+                                {{
+                                    formData.group.name
+                                }}</p>
+                        </div>
+                        <button v-if="!formData.group" @click="isSetColumn = true" class="add grey">Указать</button>
+                        <button v-else @click="isSetColumn = true" class="add white">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"
+                                fill="none">
+                                <g clip-path="url(#clip0_0_2708)">
+                                    <path
+                                        d="M12.0003 6.66671L9.33368 4.00004M1.66699 14.3334L3.92324 14.0827C4.1989 14.0521 4.33673 14.0367 4.46556 13.995C4.57985 13.958 4.68862 13.9058 4.78892 13.8396C4.90196 13.7651 5.00002 13.667 5.19614 13.4709L14.0003 4.66671C14.7367 3.93033 14.7367 2.73642 14.0003 2.00004C13.264 1.26366 12.0701 1.26366 11.3337 2.00004L2.52948 10.8042C2.33336 11.0003 2.2353 11.0984 2.16075 11.2114C2.09461 11.3117 2.04234 11.4205 2.00533 11.5348C1.96363 11.6636 1.94831 11.8015 1.91769 12.0771L1.66699 14.3334Z"
+                                        stroke="#667085" stroke-width="1.67" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_0_2708">
+                                        <rect width="16" height="16" fill="white" />
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                        </button>
                     </div>
                 </div>
                 <div class="info-element-container">
                     <p class="name">Ярлык</p>
                     <div class="content-container">
-                        <input class="add-label" type="text">
+                        <input placeholder="Введите название ярлыка" v-model="formData.label" class="add-label"
+                            type="text">
                     </div>
                 </div>
             </section>
             <hr>
             <section class="attachment-checklist">
-                <button class="grey">Добавить чеклист</button>
-                <button class="grey">Прикрепить файлы</button>
+                <button @click="isAddCheckList = true" class="add grey">Добавить чеклист</button>
+                <button class="add grey">Прикрепить файлы</button>
             </section>
             <hr>
+            <TaskCheckList/>
         </div>
         <footer class="modal-block">
             <button class="blue save">Сохранить</button>
         </footer>
         <MiniModal v-if="isSetMark" @close="isSetMark = false">
-            <ModulesContentMiniModalMarks @set-mark="setMark" @close="isSetMark = false"></ModulesContentMiniModalMarks>
+            <ModulesContentMiniModalMarks v-model="formData.marks" @set-mark="setMark" :marks-project="project.marks"
+                @close="isSetMark = false">
+            </ModulesContentMiniModalMarks>
         </MiniModal>
         <MiniModal v-if="isSetParticipants" @close="isSetParticipants = false">
-            <ul class="users-team">
-                <li v-for="user in usersTeam">
-                    <button>
-                        <img src="" alt="">
-                        <p class="name"></p>
-                    </button>
-                </li>
-            </ul>
+            <ContentMiniModalAddParticipants @close="isSetParticipants = false" v-model="formData.participants"
+                :users="project.users"></ContentMiniModalAddParticipants>
+        </MiniModal>
+        <MiniModal v-if="isSetParticipants" @close="isSetParticipants = false">
+            <ContentMiniModalAddParticipants @close="isSetParticipants = false" v-model="formData.participants"
+                :users="project.users"></ContentMiniModalAddParticipants>
+        </MiniModal>
+        <MiniModal v-if="isSetColumn" @close="isSetColumn = false">
+            <ContentMiniModalAddColumn v-model="formData.group" :groups="project.groups" />
         </MiniModal>
     </form>
 </template>
@@ -198,25 +283,84 @@ function textareaResize(e: any) {
         gap: 1rem;
 
         .info-element-container {
+            max-width: 100%;
             gap: 2rem;
 
+            .column-name {
+                background-color: $gray-200;
+                width: fit-content;
+                gap: 0.38rem;
+                border-radius: 0.5rem;
+                padding: 0.25rem 0.5rem;
+                align-items: center;
+
+                img {
+                    width: 1rem;
+                    height: 1rem;
+                }
+
+                p.name {
+                    min-width: auto;
+                    text-overflow: ellipsis;
+                    // width: 100%;
+                    max-width: 100%;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-align: center;
+                    font-size: 0.875rem;
+                    font-weight: 500;
+                    line-height: 1.25rem;
+                }
+            }
+
+            .content-container {
+                width: 100%;
+                max-width: 100%;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+
+                ul {
+                    flex-wrap: wrap;
+                    gap: 0.5rem;
+                }
+
+            }
+
             .name {
-                width: 8.75rem;
+                min-width: 8.75rem;
                 color: $gray-500;
                 font-size: 1rem;
                 font-style: normal;
                 font-weight: 400;
                 line-height: 1.5rem;
             }
+
+            .mark {
+                max-width: 100%;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                padding: 0.25rem 0.5rem;
+                text-align: center;
+                font-size: 0.875rem;
+                font-weight: 500;
+                line-height: 1.25rem;
+            }
         }
     }
 
-    .grey {
+    .add {
         color: $gray-700;
         text-align: center;
         font-size: 0.875rem;
         font-weight: 500;
         line-height: 1.25rem;
+
+        &.white {
+            padding: 0.375rem;
+        }
     }
 
     hr {

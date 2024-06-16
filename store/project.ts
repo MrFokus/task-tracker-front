@@ -7,6 +7,7 @@ export const useProjectStore = defineStore('project', {
         users: [],
         groups: [],
         tasks: [],
+        marks:[]
     }),
 
     getters: {
@@ -27,6 +28,11 @@ export const useProjectStore = defineStore('project', {
             this.teams = project.teams
             let res = await useMyFetch('/team/users', { query: { teamId: this.teams[0].id } })
             this.users = res.map(el => el.user)
+            this.marks = await useMyFetch('/mark', {
+                query: {
+                    projectId: +projectId
+                }
+            })
             return this.$state
         },
     }
