@@ -7,7 +7,8 @@ export const useProjectStore = defineStore('project', {
         users: [],
         groups: [],
         tasks: [],
-        marks:[]
+        marks: [],
+        drag:undefined
     }),
 
     getters: {
@@ -24,6 +25,7 @@ export const useProjectStore = defineStore('project', {
                 this.name = project.name
                 this.photo = project.photo
                 this.groups = project.groups
+                this.tasks = project.tasks
             }
             this.teams = project.teams
             let res = await useMyFetch('/team/users', { query: { teamId: this.teams[0].id } })

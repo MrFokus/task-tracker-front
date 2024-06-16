@@ -1,25 +1,40 @@
 <script setup lang="ts">
 import { DEFAULT_COLUMN } from '~/constants/project';
 import CardTask from './CardTask.vue';
+import { useProjectStore } from '~/store/project';
 
 const props = defineProps<{
     id: number,
     name: string,
+    cards: any[]
 }>()
-
-
 
 const emit = defineEmits<{
     createCard: [{
         id: number,
         name: string,
     }],
-    delete: [number]
+    delete: [number],
+    openTask: [number]
 }>()
+
+async function swapCard() {
+    console.log('sfgsfjgnskgsjgnsk');
+    
+    let res = await useMyFetch('/task/swap-group', {
+        method: "PUT",
+        body: {
+            taskId: useProjectStore().drag,
+            groupId: props.id
+        }
+    })
+    console.log(res);
+    useProjectStore().drag=undefined
+}
 </script>
 
 <template>
-    <div class="group-kanban column">
+    <div @dragover.prevent @drop.prevent="swapCard" :class="['group-kanban', 'column', { 'drag': useProjectStore().drag!==undefined }]">
         <div :class="['container-column-name', DEFAULT_COLUMN[name] ? 'no-delete' : '']">
             <div :style="{ backgroundColor: DEFAULT_COLUMN[name]?.background ?? 'transparent', outline: DEFAULT_COLUMN[name] ? '' : '1px solid #D0D5DD' }"
                 :class="['column-name']">
@@ -29,8 +44,9 @@ const emit = defineEmits<{
             <button @click="emit('delete', id)" class="delete">Удалить</button>
         </div>
         <div class="content column">
-            <!-- <CardTask /> -->
-            <button @click="emit('createCard', { id,name })" class="grey-button">
+            <CardTask @open="emit('openTask', $event)" v-if="cards && id" :card="card" :key="card.id"
+                v-for="card in cards" />
+            <button @click="emit('createCard', { id, name })" class="grey-button">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M10.0001 4.16666V15.8333M4.16675 9.99999H15.8334" stroke="#667085" stroke-width="1.67"
                         stroke-linecap="round" stroke-linejoin="round" />
@@ -50,8 +66,16 @@ const emit = defineEmits<{
         margin-top: -1rem;
 
         .content {
+            height: 100%;
             gap: 0.75rem;
+            border-radius: 1rem;
         }
+    }
+
+    .drag .content {
+        background-color: #E8EFFB;
+
+
     }
 
     .container-column-name {

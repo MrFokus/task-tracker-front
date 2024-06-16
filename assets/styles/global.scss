@@ -347,7 +347,7 @@ hr {
   border-radius: .25rem;
   border: 1px solid $gray-300;
   background: white;
-  margin-right: .5rem;
+  margin-right: .75rem;
   background-repeat: no-repeat;
   background-position: center center;
   background-size: 50% 50%;
@@ -356,10 +356,10 @@ hr {
 
 /* стили для чекбокса, находящегося в состоянии checked */
 .custom-checkbox>input:checked+span::before {
-  border-color: green;
-  background-color: lightgreen;
-  background-size: 0.625rem;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3e%3cpath d='M10 3L4.5 8.5L2 6' stroke='%23A1E224' stroke-width='1.6666' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
+  border-color: $blue-500;
+  background-color: $blue-50;
+  background-size: 0.875rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none'%3E%3Cpath d='M11.6663 3.5L5.24967 9.91667L2.33301 7' stroke='%232E90FA' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
 /* стили для чекбокса, находящегося в состоянии disabled */

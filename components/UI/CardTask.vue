@@ -1,60 +1,69 @@
 <script setup lang="ts">
+import { useProjectStore } from '~/store/project';
 import ListParticipants from './ListParticipants.vue';
 
+const props = defineProps<{
+    card: {
+        id: number,
+        name: string,
+        dateEnd: string,
+        dateCreate:string,
+        description?:string,
+        marks?: any[],
+        label: string,
+        subtasks?: any[],
+        attachments?:any[],
+        participants?:any[]
+    }
+}>()
+
+const emit = defineEmits<{
+    open:[number]
+}>()
 
 </script>
 
 <template>
-    <div class="task-card column">
+    <div draggable="true" @dragend="useProjectStore().drag!==undefined" @dragstart="useProjectStore().drag=card.id" @click="emit('open',card.id)" class="task-card column">
         <header>
-            <p class="template-name">Дизайн</p>
+            <p class="template-name">{{card.label}}</p>
         </header>
         <div class="card-content column">
-            <div class="mark-block">
-                
-                <p :style="{ color: '#B54708', backgroundColor: '#FFFAEB' }" class="mark">
-                    Срочно
-                </p>
-                <p :style="{ color: '#B42318', backgroundColor: '#FEF3F2' }" class="mark">
-                    Средний приоритет
-                </p>
-                <p :style="{ color: '#B42318', backgroundColor: '#FEF3F2' }" class="mark">
-                    В ожидании
-                </p>
-                <p :style="{ color: '#B42318', backgroundColor: '#FEF3F2' }" class="mark">
-                    Высокий приоритет
+            <div v-if="card.marks?.length" class="mark-block">
+                <p :key="mark.id" v-for="mark in card.marks" :style="{ color: mark.color, backgroundColor: mark.background }" class="mark">
+                    {{mark.name}}
                 </p>
             </div>
             <p class="task-name">
-                Заголовок карточки на две строки и не более, если будет превышать
+                {{ card.name }}
             </p>
             <p class="task-description">
-                Описание карточки. Здесь строк больше, чем в заголовке и отображается без сокращений три строки
+                {{ card.description }}
             </p>
             <div class="task-content-info-container">
-                <div class="content-info">
+                <!-- <div class="content-info">
                     <img src="@/assets/img/comment-info.svg" alt="">
                     <p class="result">3</p>
-                </div>
-                <div class="content-info">
+                </div> -->
+                <div v-if="card.attachments?.length" class="content-info">
                     <img src="@/assets/img/attachment-info.svg" alt="">
-                    <p class="result">3</p>
+                    <p class="result">{{ card.attachments?.length }}</p>
                 </div>
-                <div class="content-info">
+                <div v-if="card.subtasks?.length" class="content-info">
                     <img src="@/assets/img/checkbox-info.svg" alt="">
-                    <p class="result">3 из 154</p>
+                    <p class="result">{{ card.subtasks?.filter((el)=> el.status === true).length }} из {{ card.subtasks?.length }}</p>
                 </div>
             </div>
             <div class="container-participates-date">
-                <div class="dates">
-                    <p class="from">16 авг</p>
+                <div v-if="card.dateEnd" class="dates">
+                    <p class="from">{{dateTransform(card.dateCreate)}}</p>
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
                         <path d="M2 6H10M10 6L7 3M10 6L7 9" stroke="#667085" stroke-width="1.2" stroke-linecap="round"
                             stroke-linejoin="round" />
                     </svg>
-                    <p class="to">17 авг</p>
+                    <p class="to">{{dateTransform(card.dateEnd)}}</p>
                 </div>
-                <ListParticipants class="list-participants" :more-name="'+'" :list="[{ name: 'undefined' }]" />
+                <ListParticipants class="list-participants" :more-name="'+'" :list="card.participants" />
             </div>
         </div>
     </div>
@@ -69,7 +78,7 @@ import ListParticipants from './ListParticipants.vue';
         border: 1px solid $gray-300;
         background-color: white;
         overflow: hidden;
-
+        cursor: pointer;
         header {
             width: 100%;
             background: $gray-100;

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { io } from 'socket.io-client';
+import ContentModalViewCard from '~/components/Modules/ContentModalViewCard.vue';
 import ColumnKanban from '~/components/UI/ColumnKanban.vue';
 import ModalBase from '~/components/UI/ModalBase.vue';
 import { useProjectStore } from '~/store/project';
@@ -27,6 +28,7 @@ const isCreateColumn = ref(false)
 const newColumnInput = ref('')
 const projectStore = useProjectStore()
 const project = ref()
+const openTask = ref()
 project.value = await projectStore.getProject(route.params.id)
 
 
@@ -86,7 +88,10 @@ $io.on('error', (e) => {
 <template>
     <div class="kanban-component">
         <ModalBase @close="isCreateCard = false" v-if="isCreateCard && createCardColumn">
-            <ModulesContentModalCreateCard :group="createCardColumn" @close="isCreateCard = false" :project-name="project?.name" />
+            <ModulesContentModalCreateCard :project-id="project.id" :group="createCardColumn" @close="isCreateCard = false" :project-name="project?.name" />
+        </ModalBase>
+        <ModalBase @close="openTask = undefined" v-if="openTask!== undefined">
+            <ContentModalViewCard :task-id="openTask" :project-id="project.id" :group="createCardColumn" @close="openTask = undefined" :project-name="project?.name" />
         </ModalBase>
         <ModalBase v-if="isCreateColumn" @close="isCreateColumn = false">
             <form @submit.prevent="" class="create-column white-block column">
@@ -105,7 +110,7 @@ $io.on('error', (e) => {
             </form>
         </ModalBase>
         <div v-if="project.groups.length" class="kanban">
-            <ColumnKanban @delete="deleteColumn" @create-card="createCard" :id="column.id" :name="column.name"
+            <ColumnKanban @open-task="openTask = $event" :cards="project?.tasks?.filter(t=>t.column.id === column.id)" :key="column.id" @delete="deleteColumn" @create-card="createCard" :id="column.id" :name="column.name"
                 v-for="column in project.groups"></ColumnKanban>
             <div class="group-kanban column">
                 <div class="container-column-name">
@@ -135,6 +140,7 @@ $io.on('error', (e) => {
     }
 
     .kanban {
+        min-height: 100%;
         gap: 1rem;
         height: fit-content;
         width: fit-content;

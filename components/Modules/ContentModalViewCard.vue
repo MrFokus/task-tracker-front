@@ -12,6 +12,7 @@ const props = defineProps<{
     projectName: string,
     projectId: number,
     group?: any,
+    taskId: number
 }>()
 
 const isSetMark = ref(false)
@@ -31,6 +32,40 @@ const formData = ref({
     label: ''
 })
 
+watch(formData, async () => {
+    let res = await useMyFetch(`/task/${props.taskId}`, {
+        method: "PATCH",
+        body: {
+            name: formData.value.taskName,
+            description: formData.value.description,
+            projectId: props.projectId,
+            groupId: formData.value.group.id,
+            dateEnd: new Date(formData.value.dateEnd).toISOString(),
+            label: formData.value.label,
+            marks: formData.value.marks,
+            participants: formData.value.participants,
+            checkList: formData.value.checkList,
+            attachment: formData.value.attachment
+        }
+    })
+    
+},{deep:true})
+
+const task = await useMyFetch(`/task/${props.taskId}`)
+formData.value = {
+    taskName: task.name,
+    description: task.description,
+    dateEnd: task.dateEnd,
+    marks: task.marks,
+    participants: task.participants,
+    group: task.column,
+    checkList: task.subtasks,
+    attachment: task.attachment,
+    label: task.label
+}
+
+console.log(task);
+
 
 function setMark(marks: any[]) {
     formData.value.marks = marks
@@ -46,25 +81,6 @@ function textareaResize(e: any) {
     e.target.style.height = `${e.target.scrollHeight}px`;
 }
 
-async function saveTask() {
-    let res = await useMyFetch('/task', {
-        method: "POST",
-        body: {
-            name: formData.value.taskName,
-            description: formData.value.description,
-            projectId: props.projectId,
-            groupId: formData.value.group.id,
-            dateEnd: new Date(formData.value.dateEnd).toISOString(),
-            label: formData.value.label,
-            marks: formData.value.marks,
-            participants: formData.value.participants,
-            checkList: formData.value.checkList,
-            attachment: formData.value.attachment
-        }
-    })
-    emit('close')
-    
-}
 </script>
 
 <template>
@@ -192,18 +208,17 @@ async function saveTask() {
             </section>
             <hr>
             <section class="attachment-checklist">
-                <button v-if="!isAddCheckList || !formData.checkList.length" @click="isAddCheckList = true"
-                    class="add grey">Добавить чеклист</button>
+                <button v-if="!formData.checkList.length" @click="isAddCheckList = true" class="add grey">Добавить
+                    чеклист</button>
                 <button class="add grey">Прикрепить файлы</button>
             </section>
-            <hr v-if="isAddCheckList">
-            <section v-if="isAddCheckList" class="check-list column">
+            <hr v-if="formData.checkList.length">
+            <section v-if="formData.checkList.length" class="check-list column">
                 <p class="title">Чеклист</p>
                 <TaskCheckList v-model="formData.checkList" />
             </section>
         </div>
         <footer class="modal-block">
-            <button @click="saveTask" class="blue save">Сохранить</button>
         </footer>
         <MiniModal v-if="isSetMark" @close="isSetMark = false">
             <ModulesContentMiniModalMarks v-model="formData.marks" @set-mark="setMark" :marks-project="project.marks"
@@ -222,210 +237,210 @@ async function saveTask() {
 
 
 <style lang="scss" scoped>
-form {
-    position: relative;
-    height: fit-content;
-}
+    form {
+        position: relative;
+        height: fit-content;
+    }
 
-header {
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid $gray-200;
-    // padding: 0.75rem 2rem;
-
-}
-
-.close {
-    padding: .5rem;
-    aspect-ratio: 1/1;
-    height: 100%;
-
-    svg,
-    svg path {
+    header {
         width: 100%;
-        height: 100%;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid $gray-200;
+        // padding: 0.75rem 2rem;
+
+    }
+
+    .close {
+        padding: .5rem;
         aspect-ratio: 1/1;
-    }
-}
+        height: 100%;
 
-.content-modal {
-    gap: 2rem;
-    padding: 1.5rem 2rem;
-
-}
-
-.modal-block {
-    width: 50rem;
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
-}
-
-.modal-name {
-    color: $gray-500;
-    font-family: Inter;
-    font-size: 0.875rem;
-    font-weight: 400;
-    line-height: 1.25rem;
-}
-
-.container-name-description {
-    gap: 0.5rem;
-}
-
-.task-name {
-    &::placeholder {
-        color: $gray-500;
+        svg,
+        svg path {
+            width: 100%;
+            height: 100%;
+            aspect-ratio: 1/1;
+        }
     }
 
-    font-size: 1.5rem;
-    font-weight: 500;
-    line-height: 2rem;
-    color: $gray-900;
-}
-
-.task-description {
-    &::placeholder {
-        color: $gray-500;
-    }
-
-    min-height: 1.5rem;
-    color: $gray-900;
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.5rem;
-    max-height: 300px;
-    resize: none;
-    height: 1.5rem;
-}
-
-.task-info {
-    gap: 1rem;
-
-    .info-element-container {
-        max-width: 100%;
+    .content-modal {
         gap: 2rem;
+        padding: 1.5rem 2rem;
 
-        .column-name {
-            background-color: $gray-200;
-            width: fit-content;
-            gap: 0.38rem;
-            border-radius: 0.5rem;
-            padding: 0.25rem 0.5rem;
-            align-items: center;
+    }
 
-            img {
-                width: 1rem;
-                height: 1rem;
+    .modal-block {
+        width: 50rem;
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+    }
+
+    .modal-name {
+        color: $gray-500;
+        font-family: Inter;
+        font-size: 0.875rem;
+        font-weight: 400;
+        line-height: 1.25rem;
+    }
+
+    .container-name-description {
+        gap: 0.5rem;
+    }
+
+    .task-name {
+        &::placeholder {
+            color: $gray-500;
+        }
+
+        font-size: 1.5rem;
+        font-weight: 500;
+        line-height: 2rem;
+        color: $gray-900;
+    }
+
+    .task-description {
+        &::placeholder {
+            color: $gray-500;
+        }
+
+        min-height: 1.5rem;
+        color: $gray-900;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5rem;
+        max-height: 300px;
+        resize: none;
+        height: 1.5rem;
+    }
+
+    .task-info {
+        gap: 1rem;
+
+        .info-element-container {
+            max-width: 100%;
+            gap: 2rem;
+
+            .column-name {
+                background-color: $gray-200;
+                width: fit-content;
+                gap: 0.38rem;
+                border-radius: 0.5rem;
+                padding: 0.25rem 0.5rem;
+                align-items: center;
+
+                img {
+                    width: 1rem;
+                    height: 1rem;
+                }
+
+                p.name {
+                    min-width: auto;
+                    text-overflow: ellipsis;
+                    // width: 100%;
+                    max-width: 100%;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-align: center;
+                    font-size: 0.875rem;
+                    font-weight: 500;
+                    line-height: 1.25rem;
+                }
             }
 
-            p.name {
-                min-width: auto;
-                text-overflow: ellipsis;
-                // width: 100%;
+            .content-container {
+                width: 100%;
                 max-width: 100%;
-                overflow: hidden;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+
+                ul {
+                    flex-wrap: wrap;
+                    gap: 0.5rem;
+                }
+
+            }
+
+            .name {
+                min-width: 8.75rem;
+                color: $gray-500;
+                font-size: 1rem;
+                font-style: normal;
+                font-weight: 400;
+                line-height: 1.5rem;
+            }
+
+            .mark {
+                max-width: 100%;
+                text-overflow: ellipsis;
                 white-space: nowrap;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                padding: 0.25rem 0.5rem;
                 text-align: center;
                 font-size: 0.875rem;
                 font-weight: 500;
                 line-height: 1.25rem;
             }
         }
+    }
 
-        .content-container {
-            width: 100%;
-            max-width: 100%;
-            flex-wrap: wrap;
-            gap: 0.5rem;
+    .add {
+        color: $gray-700;
+        text-align: center;
+        font-size: 0.875rem;
+        font-weight: 500;
+        line-height: 1.25rem;
 
-            ul {
-                flex-wrap: wrap;
-                gap: 0.5rem;
-            }
-
+        &.white {
+            padding: 0.375rem;
         }
+    }
 
-        .name {
-            min-width: 8.75rem;
-            color: $gray-500;
-            font-size: 1rem;
-            font-style: normal;
-            font-weight: 400;
-            line-height: 1.5rem;
-        }
+    hr {
+        border-top: 1px solid $gray-200;
+    }
 
-        .mark {
-            max-width: 100%;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            padding: 0.25rem 0.5rem;
-            text-align: center;
+    .attachment-checklist {
+        gap: 0.75rem;
+    }
+
+    footer {
+        justify-content: flex-end;
+        border-top: 1px solid $gray-200;
+
+        .save {
+            padding: 0.625rem 1rem;
             font-size: 0.875rem;
-            font-weight: 500;
+            font-style: normal;
+            font-weight: 600;
             line-height: 1.25rem;
         }
     }
-}
 
-.add {
-    color: $gray-700;
-    text-align: center;
-    font-size: 0.875rem;
-    font-weight: 500;
-    line-height: 1.25rem;
-
-    &.white {
-        padding: 0.375rem;
-    }
-}
-
-hr {
-    border-top: 1px solid $gray-200;
-}
-
-.attachment-checklist {
-    gap: 0.75rem;
-}
-
-footer {
-    justify-content: flex-end;
-    border-top: 1px solid $gray-200;
-
-    .save {
-        padding: 0.625rem 1rem;
+    .add-label {
+        padding: 0;
+        padding: 0.25rem 0.5rem;
         font-size: 0.875rem;
-        font-style: normal;
-        font-weight: 600;
-        line-height: 1.25rem;
-    }
-}
-
-.add-label {
-    padding: 0;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    line-height: 1.25rem;
-    color: $gray-700;
-    background-color: $gray-100;
-
-    &:focus {
-        background-color: #fff;
-    }
-}
-
-.check-list {
-    gap: 0.75rem;
-
-    .title {
-        color: $gray-900;
-        font-size: 1rem;
         font-weight: 500;
-        line-height: 1.5rem;
+        line-height: 1.25rem;
+        color: $gray-700;
+        background-color: $gray-100;
+
+        &:focus {
+            background-color: #fff;
+        }
     }
-}
+
+    .check-list {
+        gap: 0.75rem;
+
+        .title {
+            color: $gray-900;
+            font-size: 1rem;
+            font-weight: 500;
+            line-height: 1.5rem;
+        }
+    }
 </style>
