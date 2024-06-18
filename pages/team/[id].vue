@@ -80,7 +80,7 @@ await getTeam()
                 </div>
             </div>
             <div v-if="team.projects" class="projects">
-                <ProjectCard :id="project.id" :name="project.name" v-for="project in team.projects"></ProjectCard>
+                <ProjectCard :photo="project.photo" :id="project.id" :name="project.name" v-for="project in team.projects"></ProjectCard>
             </div>
             <EmptyContent v-else description="Проектов пока что нет. <br> Вы можете создать первый проект команды!"></EmptyContent>
             

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { IRegister} from '~/interfaces/account';
-
+definePageMeta({
+    layout: undefined
+})
 const access_token = useCookie('access_token', { maxAge: 360000})
 const registerData = ref<IRegister>({
     login: '',

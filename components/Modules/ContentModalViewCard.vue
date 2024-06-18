@@ -6,6 +6,8 @@ import ContentMiniModalAddParticipants from './ContentMiniModalAddParticipants.v
 import ContentMiniModalAddColumn from './ContentMiniModalAddColumn.vue';
 import { DEFAULT_COLUMN } from '~/constants/project';
 import TaskCheckList from '../UI/TaskCheckList.vue';
+import DropFile from '../UI/DropFile.vue';
+import AttachmentElement from '../UI/AttachmentElement.vue';
 
 const project = useProjectStore()
 const props = defineProps<{
@@ -79,6 +81,19 @@ const emit = defineEmits<{
 function textareaResize(e: any) {
     e.target.style.height = 'auto';
     e.target.style.height = `${e.target.scrollHeight}px`;
+}
+
+async function uploadFiles(files:File[]) {
+    let file = new FormData()
+    console.log(files);
+    
+    files.forEach(f=>file.append('files', f))
+    let res = await useMyFetch('/task/upload', {
+        method: 'POST',
+        body:file
+    })
+    console.log(res);
+    
 }
 
 </script>
@@ -216,6 +231,12 @@ function textareaResize(e: any) {
             <section v-if="formData.checkList.length" class="check-list column">
                 <p class="title">Чеклист</p>
                 <TaskCheckList v-model="formData.checkList" />
+            </section>
+            <hr>
+            <section class="attachments column">
+                <p class="title">Вложения</p>
+                <AttachmentElement></AttachmentElement>
+                <DropFile @upload="uploadFiles"></DropFile>
             </section>
         </div>
         <footer class="modal-block">
@@ -433,7 +454,7 @@ function textareaResize(e: any) {
         }
     }
 
-    .check-list {
+    .check-list, .attachments {
         gap: 0.75rem;
 
         .title {

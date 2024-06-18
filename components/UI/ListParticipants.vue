@@ -11,7 +11,7 @@ const props = defineProps<{
     <div class="list-participants-component">
         <div v-crop-content="(length:number)=>otherParticipants = length" class="profiles">
             <img class="profile" v-for="profile in list" :title="profile?.name"
-                :src="profile?.photo " alt="">
+                :src="profile?.photo??'/no-user-profile.svg' " alt="">
         </div>
         <div class="other-container">
             <nuxt-link v-if="otherParticipants">

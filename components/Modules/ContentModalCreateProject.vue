@@ -2,8 +2,9 @@
 import type { IAddUser, User } from '~/interfaces/account';
 import Search from '../UI/Search.vue';
 import Select from '../UI/Select.vue';
-import {type  ITeamBase, type ITeamParticipates } from '~/interfaces/team';
+import { type ITeamBase, type ITeamParticipates } from '~/interfaces/team';
 import noUserProfile from '~/assets/img/no-user-profile.svg'
+import DropFile from '../UI/DropFile.vue';
 
 const emit = defineEmits<{
     close: []
@@ -11,7 +12,7 @@ const emit = defineEmits<{
 
 const team = ref<ITeamBase>({
     id: -1,
-    name:''
+    name: ''
 })
 const listSelectRole = ref(await useMyFetch<{ id: number, name: string, nameRu: string }[] | undefined>('/role'))
 const projectName = ref()
@@ -19,6 +20,11 @@ const listPeople = ref<IAddUser[]>([])
 const searchTeam = ref('')
 const listSearchTeam = ref<ITeamBase[]>()
 const isSearchTeam = ref(false)
+const photo = ref()
+const photoUrl = computed(() => {
+    if (photo.value)
+        return URL.createObjectURL(photo.value)
+})
 // function addPeople(user: User) {
 //     console.log(listPeople.value.find((el)=>el.id !==user.id));
 //     if (!listPeople.value.find((el) => el.id === user.id)) {
@@ -48,26 +54,35 @@ async function createProject() {
         console.log(res);
 
         if (res) {
+            let fd = new FormData()
+            fd.append('file', photo.value)
+            let photoRes = await useMyFetch('project/upload/' + res.id, {
+                method: 'POST',
+                body: fd
+            })
             navigateTo(`/project/${res.id}`)
         }
     }
-    catch (e:any) {
+    catch (e: any) {
         console.log(e.message);
-        
+
     }
-    
+
 }
-function selectTeam(teamSelect:ITeamBase) {
+function selectTeam(teamSelect: ITeamBase) {
     team.value = teamSelect
     isSearchTeam.value = false
 }
-watch(()=>team.value.name, async () => {
+function addPhoto(file: File[]) {
+    photo.value =file[0]
+}
+watch(() => team.value.name, async () => {
     listSearchTeam.value = await useMyFetch<ITeamBase[]>('/team/search', {
         query: {
             name: team.value.name
         }
     })
-},{immediate:true})
+}, { immediate: true })
 </script>
 
 <template>
@@ -84,12 +99,20 @@ watch(()=>team.value.name, async () => {
         <hr>
         <div class="content-modal modal-block column">
             <div class="input-container column">
+                <p class="input-name">Фото проекта</p>
+                <img class="profile" v-if="photoUrl" :src="photoUrl" alt="">
+                <DropFile :multiple="false" accept="image/jpg,image/jpeg,image/png,image/svg" @upload="addPhoto"></DropFile>
+
+            </div>
+
+            <div class="input-container column">
                 <p class="input-name">Название проекта</p>
                 <input v-model="projectName" placeholder="Введите название проекта" type="text">
             </div>
             <div class="input-container column">
                 <p class="input-name">Команда</p>
-                <Search v-model:is-search="isSearchTeam" v-model="team.name" :attributes="{placeholder: 'Введите название команды'}">
+                <Search v-model:is-search="isSearchTeam" v-model="team.name"
+                    :attributes="{ placeholder: 'Введите название команды' }">
                     <li @click="selectTeam(team)" class="team-search" v-for="team in listSearchTeam">
                         <img class="team-photo" :src="team?.photo ?? noUserProfile" alt="">
                         <p class="team-name">{{ team?.name }}</p>
@@ -128,124 +151,131 @@ watch(()=>team.value.name, async () => {
 
 
 <style scoped lang="scss">
-    form {
-        height: fit-content;
-    }
+form {
+    height: fit-content;
+}
 
-    header {
+header {
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    // padding: 0.75rem 2rem;
+
+}
+
+.close {
+    padding: .5rem;
+    aspect-ratio: 1/1;
+    height: 100%;
+
+    svg,
+    svg path {
         width: 100%;
-        justify-content: space-between;
-        align-items: center;
-        // padding: 0.75rem 2rem;
-
-    }
-
-    .close {
-        padding: .5rem;
-        aspect-ratio: 1/1;
         height: 100%;
-
-        svg,
-        svg path {
-            width: 100%;
-            height: 100%;
-            aspect-ratio: 1/1;
-        }
-    }
-
-    .content-modal {
-        gap: 1rem;
-    }
-
-    .modal-block {
-        width: 50rem;
-        padding-top: 0.75rem;
-        padding-bottom: 0.75rem;
-    }
-
-    .modal-name {
-        font-family: Inter;
-        font-size: 1.25rem;
-        font-style: normal;
-        font-weight: 500;
-        line-height: 150%;
-    }
-
-    .input-container {
-        gap: .5rem;
-        width: 100%;
-    }
-
-    footer {
-        justify-content: flex-end;
-    }
-
-    .includes-participants {
-        gap: 0;
-        // max-height: 20rem;
-    }
-
-    .include-profile {
-        padding-bottom: .5rem;
-        padding-top: .5rem;
-        display: grid;
-        grid-template-columns: auto auto 1fr 30% auto;
-        align-items: center;
-        justify-items: end;
-        gap: 2rem;
-        border-bottom: 1px $gray-300 solid;
-
-        .profile-photo {
-            width: 3rem;
-            aspect-ratio: 1/1;
-        }
-
-        .full-name {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            text-align: end;
-            color: $gray-500;
-            max-width: 100%;
-        }
-    }
-    .delete-user{
-        height: 2.375rem;
-        padding: 0.5rem;
-        width: 100%;
         aspect-ratio: 1/1;
-        align-items: center;
-        justify-content: center;
     }
-    .team-search {
-        cursor: pointer;
-        padding: 0.25rem .5rem;
-        display: grid;
-        align-items: center;
-        grid-template-columns: auto auto 1fr;
-        gap: 2rem;
+}
+
+.content-modal {
+    gap: 1rem;
+}
+
+.modal-block {
+    width: 50rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.modal-name {
+    font-family: Inter;
+    font-size: 1.25rem;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 150%;
+}
+
+.input-container {
+    gap: .5rem;
+    width: 100%;
+}
+
+footer {
+    justify-content: flex-end;
+}
+
+.includes-participants {
+    gap: 0;
+    // max-height: 20rem;
+}
+
+.include-profile {
+    padding-bottom: .5rem;
+    padding-top: .5rem;
+    display: grid;
+    grid-template-columns: auto auto 1fr 30% auto;
+    align-items: center;
+    justify-items: end;
+    gap: 2rem;
+    border-bottom: 1px $gray-300 solid;
+
+    .profile-photo {
+        width: 3rem;
+        aspect-ratio: 1/1;
+    }
+
+    .full-name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: end;
+        color: $gray-500;
         max-width: 100%;
-        width: 100%;
-
-        img {
-            object-fit: cover;
-            width: 2rem;
-            height: 2rem;
-        }
-
-        .team-name {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            text-align: end;
-            color: $gray-500;
-            max-width: 100%;
-
-        }
-
-        &:hover {
-            border-radius: 0.5rem;
-            background-color: $gray-100;
-        }
     }
+}
+
+.delete-user {
+    height: 2.375rem;
+    padding: 0.5rem;
+    width: 100%;
+    aspect-ratio: 1/1;
+    align-items: center;
+    justify-content: center;
+}
+
+.team-search {
+    cursor: pointer;
+    padding: 0.25rem .5rem;
+    display: grid;
+    align-items: center;
+    grid-template-columns: auto auto 1fr;
+    gap: 2rem;
+    max-width: 100%;
+    width: 100%;
+
+    img {
+        object-fit: cover;
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .team-name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: end;
+        color: $gray-500;
+        max-width: 100%;
+
+    }
+
+    &:hover {
+        border-radius: 0.5rem;
+        background-color: $gray-100;
+    }
+}
+
+.profile {
+    width: 10rem;
+    margin: 0 auto;
+}
 </style>

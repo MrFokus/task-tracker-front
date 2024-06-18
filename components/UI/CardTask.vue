@@ -7,31 +7,33 @@ const props = defineProps<{
         id: number,
         name: string,
         dateEnd: string,
-        dateCreate:string,
-        description?:string,
+        dateCreate: string,
+        description?: string,
         marks?: any[],
         label: string,
         subtasks?: any[],
-        attachments?:any[],
-        participants?:any[]
+        attachments?: any[],
+        participants?: any[]
     }
 }>()
 
 const emit = defineEmits<{
-    open:[number]
+    open: [number]
 }>()
 
 </script>
 
 <template>
-    <div draggable="true" @dragend="useProjectStore().drag!==undefined" @dragstart="useProjectStore().drag=card.id" @click="emit('open',card.id)" class="task-card column">
+    <div draggable="true" @dragend="useProjectStore().drag !== undefined" @dragstart="useProjectStore().drag = card.id"
+        @click="emit('open', card.id)" class="task-card column">
         <header>
-            <p class="template-name">{{card.label}}</p>
+            <p class="template-name">{{ card.label }}</p>
         </header>
         <div class="card-content column">
             <div v-if="card.marks?.length" class="mark-block">
-                <p :key="mark.id" v-for="mark in card.marks" :style="{ color: mark.color, backgroundColor: mark.background }" class="mark">
-                    {{mark.name}}
+                <p :key="mark.id" v-for="mark in card.marks"
+                    :style="{ color: mark.color, backgroundColor: mark.background }" class="mark">
+                    {{ mark.name }}
                 </p>
             </div>
             <p class="task-name">
@@ -51,19 +53,20 @@ const emit = defineEmits<{
                 </div>
                 <div v-if="card.subtasks?.length" class="content-info">
                     <img src="@/assets/img/checkbox-info.svg" alt="">
-                    <p class="result">{{ card.subtasks?.filter((el)=> el.status === true).length }} из {{ card.subtasks?.length }}</p>
+                    <p class="result">{{ card.subtasks?.filter((el) => el.status === true).length }} из {{
+                        card.subtasks?.length }}</p>
                 </div>
             </div>
             <div class="container-participates-date">
                 <div v-if="card.dateEnd" class="dates">
-                    <p class="from">{{dateTransform(card.dateCreate)}}</p>
+                    <p class="from">{{ dateTransform(card.dateCreate) }}</p>
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
                         <path d="M2 6H10M10 6L7 3M10 6L7 9" stroke="#667085" stroke-width="1.2" stroke-linecap="round"
                             stroke-linejoin="round" />
                     </svg>
-                    <p class="to">{{dateTransform(card.dateEnd)}}</p>
+                    <p class="to">{{ dateTransform(card.dateEnd) }}</p>
                 </div>
-                <ListParticipants class="list-participants" :more-name="'+'" :list="card.participants" />
+                    <ListParticipants class="list-participants" :more-name="'+'" :list="card.participants" />
             </div>
         </div>
     </div>
@@ -71,119 +74,123 @@ const emit = defineEmits<{
 
 
 <style lang="scss" scoped>
-    .task-card {
+.task-card {
+    width: 100%;
+    height: fit-content;
+    border-radius: 1rem;
+    border: 1px solid $gray-300;
+    background-color: white;
+    overflow: hidden;
+    cursor: pointer;
+
+    header {
         width: 100%;
-        height: fit-content;
-        border-radius: 1rem;
-        border: 1px solid $gray-300;
-        background-color: white;
-        overflow: hidden;
-        cursor: pointer;
-        header {
-            width: 100%;
-            background: $gray-100;
-            padding: 0.5rem 1rem;
+        background: $gray-100;
+        padding: 0.5rem 1rem;
 
-            .template-name {
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                overflow: hidden;
-            }
+        .template-name {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
         }
     }
+}
 
-    .card-content {
-        padding: 1rem;
-        gap: 1rem;
-    }
+.card-content {
+    padding: 1rem;
+    gap: 1rem;
+}
 
-    .task-name {
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        color: $gray-900;
-        font-size: 1rem;
-        font-style: normal;
-        font-weight: 500;
-        line-height: 1.5rem;
-    }
+.task-name {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: $gray-900;
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 1.5rem;
+}
 
-    .task-description {
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 3;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        color: $gray-500;
-        font-size: 0.875rem;
-        font-style: normal;
-        font-weight: 400;
-        line-height: 1.25rem;
-    }
+.task-description {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: $gray-500;
+    font-size: 0.875rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1.25rem;
+}
 
-    .mark-block {
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        // .mark {
-        //     white-space: nowrap;
-        // }
-    }
+.mark-block {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    // .mark {
+    //     white-space: nowrap;
+    // }
+}
 
-    .profile:nth-of-type(n) {
-        margin-left: -0.5rem;
-    }
+.profile:nth-of-type(n) {
+    margin-left: -0.5rem;
+}
 
-    .profile:first-of-type {
-        margin-left: 0rem;
-    }
+.profile:first-of-type {
+    margin-left: 0rem;
+}
 
-    .task-content-info-container {
-        gap: 1.25rem;
+.task-content-info-container {
+    gap: 1.25rem;
 
-        .content-info {
-            gap: .25rem;
+    .content-info {
+        gap: .25rem;
 
-            .result {
-                color: $gray-500;
-            }
+        .result {
+            color: $gray-500;
         }
     }
+}
 
-    .container-participates-date {
+.container-participates-date {
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+
+    .dates {
+        // width: 100%;
         align-items: center;
-        justify-content: flex-end;
-        gap: 1rem;
+        gap: 0.25rem;
 
-        .dates {
-            // width: 100%;
-            align-items: center;
-            gap: 0.25rem;
-
-            p {
-                color: $gray-500;
-            }
+        p {
+            color: $gray-500;
         }
     }
+}
 
-    .list-participants:deep() {
+.list-participants:deep() {
+    max-height: 2.5rem;
+    padding: 0;
+    max-width: 70%;
+    width: fit-content;
+    justify-content: flex-end;
+
+    .profiles {
+        width: fit-content;
+        justify-content: flex-end;
+
+    }
+
+    .other-container {
         padding: 0;
-        max-width: 70%;
-        justify-content: flex-end;
 
-        .profiles {
-            width: fit-content;
-        }
-
-        .other-container {
-            padding: 0;
-
-            a {
-                font-size: 0.875rem;
-                color: $gray-500;
-            }
+        a {
+            font-size: 0.875rem;
+            color: $gray-500;
         }
     }
-
+}
 </style>

@@ -74,8 +74,8 @@ const project = useProjectStore()
   }
 
   .participants {
-    max-width: 100%;
-
+    max-width: 20rem;
+    max-height: 2.5rem;
   }
 
   .path-element {

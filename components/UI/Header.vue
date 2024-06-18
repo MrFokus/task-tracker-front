@@ -1,9 +1,19 @@
 <script setup lang="ts">
+const user = ref()
+onMounted(async () => {
+   user.value = await useMyFetch('/user')
+})
+const route = useRoute()
+
+
+watch(() => route.name, async () => {
+    user.value = await useMyFetch('/user')
+})
 
 </script>
 
 <template>
-    <header class="padding-page">
+    <header v-if="route.name!=='login' && route.name!=='register' " class="padding-page">
         <nuxt-link to="/" class="logo">
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
                 <path
@@ -16,14 +26,14 @@
             <p class="name">ИнтерПро</p>
         </nuxt-link>
         <div class="profile-header">
-            <NuxtLink class="settings" to="#">
+            <!-- <NuxtLink class="settings" to="#">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path
                         d="M2.5 6.66667L12.5 6.66667M12.5 6.66667C12.5 8.04738 13.6193 9.16667 15 9.16667C16.3807 9.16667 17.5 8.04738 17.5 6.66667C17.5 5.28596 16.3807 4.16667 15 4.16667C13.6193 4.16667 12.5 5.28596 12.5 6.66667ZM7.5 13.3333L17.5 13.3333M7.5 13.3333C7.5 14.714 6.38071 15.8333 5 15.8333C3.61929 15.8333 2.5 14.714 2.5 13.3333C2.5 11.9526 3.61929 10.8333 5 10.8333C6.38071 10.8333 7.5 11.9526 7.5 13.3333Z"
                         stroke="#667085" stroke-width="1.67" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
-            </NuxtLink>
-            <img src="@/assets/img/no-user-profile.svg" alt="">
+            </NuxtLink> -->
+            <img :src="user?.photo ?? '/no-user-profile.svg'" alt="">
         </div>
     </header>
 </template>

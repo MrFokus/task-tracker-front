@@ -9,20 +9,20 @@ const props = defineProps<{
 
 <template>
     <nuxt-link :to="`/project/${id}`" class="project-card">
-        <img src="https://static.wixstatic.com/media/f47f99_2990d6716f154cabb5ab3f7eea7d55a3~mv2.png" alt=""
+        <img :src="photo??'/no-project-photo.svg'" alt=""
             class="preview">
         <div class="info">
-            <p class="project-name">«{{name}}»</p>
-            <p class="last-update">
+            <p class="project-name">{{name}}</p>
+            <!-- <p class="last-update">
                 Обновлено 2 часа назад
-            </p>
+            </p> -->
         </div>
     </nuxt-link>
 </template>
 
 <style scoped lang="scss">
     .project-card {
-        min-width: 16.75rem;
+        min-width: 16.7rem;
         width: 16.75rem;
         cursor: pointer;
         border: 1px solid $gray-300;
@@ -30,11 +30,12 @@ const props = defineProps<{
         flex-direction: column;
         overflow: hidden;
 
+
         .preview {
             height: 6.25rem;
             width: 100%;
             background-color: $gray-100;
-            object-fit: cover;
+            object-fit: contain;
         }
 
         .info {

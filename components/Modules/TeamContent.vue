@@ -51,8 +51,8 @@ await getProjects()
         </ListParticipants>
         <div class="last-projects-container">
             <p class="title">Последние проекты</p>
-            <div class="last-projects">
-                <ProjectCard :id="project.id" :name="project.name" v-for="project in projects"></ProjectCard>
+            <div v-crop-content class="last-projects">
+                <ProjectCard :photo="project.photo" :id="project.id" :name="project.name" v-for="project in projects"></ProjectCard>
             </div>
         </div>
     </div>

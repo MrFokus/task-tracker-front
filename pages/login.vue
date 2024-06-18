@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useMyFetch } from "~/composables/myFetch";
-
+definePageMeta({
+    layout: undefined
+})
 const access_token = useCookie('access_token', { maxAge: 360000})
 const credential = ref<{ login: string, password: string }>({
   login: '',
