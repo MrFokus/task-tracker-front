@@ -14,13 +14,14 @@ const props = defineProps<{
     projectName: string,
     projectId: number,
     group?: any,
-    taskId: number
+    taskId: number,
 }>()
 
 const isSetMark = ref(false)
 const isSetParticipants = ref(false)
 const isSetColumn = ref(false)
 const isAddCheckList = ref(false)
+const isAddAttachments = ref(false)
 
 const formData = ref({
     taskName: '',
@@ -30,10 +31,10 @@ const formData = ref({
     participants: [],
     group: props.group,
     checkList: [],
-    attachment: [],
+    attachments: [],
     label: ''
 })
-
+await getTask()
 watch(formData, async () => {
     let res = await useMyFetch(`/task/${props.taskId}`, {
         method: "PATCH",
@@ -47,26 +48,36 @@ watch(formData, async () => {
             marks: formData.value.marks,
             participants: formData.value.participants,
             checkList: formData.value.checkList,
-            attachment: formData.value.attachment
+            attachments: formData.value.attachments
         }
     })
-    
-},{deep:true})
+    console.log(res);
 
-const task = await useMyFetch(`/task/${props.taskId}`)
-formData.value = {
-    taskName: task.name,
-    description: task.description,
-    dateEnd: task.dateEnd,
-    marks: task.marks,
-    participants: task.participants,
-    group: task.column,
-    checkList: task.subtasks,
-    attachment: task.attachment,
-    label: task.label
+
+}, { deep: true })
+
+
+async function getTask() {
+
+    const task = await useMyFetch(`/task/${props.taskId}`)
+    if(task)
+    formData.value = {
+        taskName: task.name,
+        description: task.description,
+        dateEnd: task.dateEnd,
+        marks: task.marks,
+        participants: task.participants,
+        group: task.column,
+        checkList: task.subtasks,
+        attachments: task.attachments,
+        label: task.label
+    }
 }
 
-console.log(task);
+async function deleteAttachments() {
+    await getTask()
+}
+
 
 
 function setMark(marks: any[]) {
@@ -83,17 +94,18 @@ function textareaResize(e: any) {
     e.target.style.height = `${e.target.scrollHeight}px`;
 }
 
-async function uploadFiles(files:File[]) {
+async function uploadFiles(files: File[]) {
     let file = new FormData()
     console.log(files);
-    
-    files.forEach(f=>file.append('files', f))
-    let res = await useMyFetch('/task/upload', {
+
+    files.forEach(f => file.append('files', f))
+    let res = await useMyFetch('/task/upload/' + props.taskId, {
         method: 'POST',
-        body:file
+        body: file
     })
+    await getTask()
     console.log(res);
-    
+
 }
 
 </script>
@@ -221,22 +233,23 @@ async function uploadFiles(files:File[]) {
                     </div>
                 </div>
             </section>
-            <hr>
-            <section class="attachment-checklist">
+            <hr v-if="!formData.checkList?.length || !formData.attachments?.length">
+            <section v-if="!formData.checkList?.length || !formData.attachments?.length" class="attachment-checklist">
                 <button v-if="!formData.checkList.length" @click="isAddCheckList = true" class="add grey">Добавить
                     чеклист</button>
-                <button class="add grey">Прикрепить файлы</button>
+                <button v-if="!formData.attachments.length" @click="isAddAttachments = true" class="add grey">Прикрепить файлы</button>
             </section>
             <hr v-if="formData.checkList.length">
-            <section v-if="formData.checkList.length" class="check-list column">
+            <section v-if="formData.checkList.length || isAddCheckList" class="check-list column">
                 <p class="title">Чеклист</p>
                 <TaskCheckList v-model="formData.checkList" />
             </section>
-            <hr>
-            <section class="attachments column">
+            <hr v-if="formData.checkList?.length || formData.attachments?.length">
+            <section v-if="formData.attachments?.length || isAddAttachments" class="attachments column">
                 <p class="title">Вложения</p>
-                <AttachmentElement></AttachmentElement>
-                <DropFile @upload="uploadFiles"></DropFile>
+                <AttachmentElement @delete="deleteAttachments" :file="file" :key="file.id" v-for="file in formData.attachments">
+                </AttachmentElement>
+                <DropFile :multiple="true" @upload="uploadFiles"></DropFile>
             </section>
         </div>
         <footer class="modal-block">
@@ -258,210 +271,211 @@ async function uploadFiles(files:File[]) {
 
 
 <style lang="scss" scoped>
-    form {
-        position: relative;
-        height: fit-content;
-    }
+form {
+    position: relative;
+    height: fit-content;
+}
 
-    header {
+header {
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid $gray-200;
+    // padding: 0.75rem 2rem;
+
+}
+
+.close {
+    padding: .5rem;
+    aspect-ratio: 1/1;
+    height: 100%;
+
+    svg,
+    svg path {
         width: 100%;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid $gray-200;
-        // padding: 0.75rem 2rem;
-
-    }
-
-    .close {
-        padding: .5rem;
-        aspect-ratio: 1/1;
         height: 100%;
-
-        svg,
-        svg path {
-            width: 100%;
-            height: 100%;
-            aspect-ratio: 1/1;
-        }
+        aspect-ratio: 1/1;
     }
+}
 
-    .content-modal {
-        gap: 2rem;
-        padding: 1.5rem 2rem;
+.content-modal {
+    gap: 2rem;
+    padding: 1.5rem 2rem;
 
-    }
+}
 
-    .modal-block {
-        width: 50rem;
-        padding-top: 0.75rem;
-        padding-bottom: 0.75rem;
-    }
+.modal-block {
+    width: 50rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
 
-    .modal-name {
+.modal-name {
+    color: $gray-500;
+    font-family: Inter;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.25rem;
+}
+
+.container-name-description {
+    gap: 0.5rem;
+}
+
+.task-name {
+    &::placeholder {
         color: $gray-500;
-        font-family: Inter;
-        font-size: 0.875rem;
-        font-weight: 400;
-        line-height: 1.25rem;
     }
 
-    .container-name-description {
-        gap: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 500;
+    line-height: 2rem;
+    color: $gray-900;
+}
+
+.task-description {
+    &::placeholder {
+        color: $gray-500;
     }
 
-    .task-name {
-        &::placeholder {
-            color: $gray-500;
-        }
+    min-height: 1.5rem;
+    color: $gray-900;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5rem;
+    max-height: 300px;
+    resize: none;
+    height: 1.5rem;
+}
 
-        font-size: 1.5rem;
-        font-weight: 500;
-        line-height: 2rem;
-        color: $gray-900;
-    }
+.task-info {
+    gap: 1rem;
 
-    .task-description {
-        &::placeholder {
-            color: $gray-500;
-        }
+    .info-element-container {
+        max-width: 100%;
+        gap: 2rem;
 
-        min-height: 1.5rem;
-        color: $gray-900;
-        font-size: 1rem;
-        font-weight: 400;
-        line-height: 1.5rem;
-        max-height: 300px;
-        resize: none;
-        height: 1.5rem;
-    }
+        .column-name {
+            background-color: $gray-200;
+            width: fit-content;
+            gap: 0.38rem;
+            border-radius: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            align-items: center;
 
-    .task-info {
-        gap: 1rem;
-
-        .info-element-container {
-            max-width: 100%;
-            gap: 2rem;
-
-            .column-name {
-                background-color: $gray-200;
-                width: fit-content;
-                gap: 0.38rem;
-                border-radius: 0.5rem;
-                padding: 0.25rem 0.5rem;
-                align-items: center;
-
-                img {
-                    width: 1rem;
-                    height: 1rem;
-                }
-
-                p.name {
-                    min-width: auto;
-                    text-overflow: ellipsis;
-                    // width: 100%;
-                    max-width: 100%;
-                    overflow: hidden;
-                    white-space: nowrap;
-                    text-align: center;
-                    font-size: 0.875rem;
-                    font-weight: 500;
-                    line-height: 1.25rem;
-                }
+            img {
+                width: 1rem;
+                height: 1rem;
             }
 
-            .content-container {
-                width: 100%;
-                max-width: 100%;
-                flex-wrap: wrap;
-                gap: 0.5rem;
-
-                ul {
-                    flex-wrap: wrap;
-                    gap: 0.5rem;
-                }
-
-            }
-
-            .name {
-                min-width: 8.75rem;
-                color: $gray-500;
-                font-size: 1rem;
-                font-style: normal;
-                font-weight: 400;
-                line-height: 1.5rem;
-            }
-
-            .mark {
-                max-width: 100%;
+            p.name {
+                min-width: auto;
                 text-overflow: ellipsis;
-                white-space: nowrap;
+                // width: 100%;
+                max-width: 100%;
                 overflow: hidden;
-                display: flex;
-                align-items: center;
-                padding: 0.25rem 0.5rem;
+                white-space: nowrap;
                 text-align: center;
                 font-size: 0.875rem;
                 font-weight: 500;
                 line-height: 1.25rem;
             }
         }
-    }
 
-    .add {
-        color: $gray-700;
-        text-align: center;
-        font-size: 0.875rem;
-        font-weight: 500;
-        line-height: 1.25rem;
+        .content-container {
+            width: 100%;
+            max-width: 100%;
+            flex-wrap: wrap;
+            gap: 0.5rem;
 
-        &.white {
-            padding: 0.375rem;
+            ul {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
         }
-    }
 
-    hr {
-        border-top: 1px solid $gray-200;
-    }
-
-    .attachment-checklist {
-        gap: 0.75rem;
-    }
-
-    footer {
-        justify-content: flex-end;
-        border-top: 1px solid $gray-200;
-
-        .save {
-            padding: 0.625rem 1rem;
-            font-size: 0.875rem;
+        .name {
+            min-width: 8.75rem;
+            color: $gray-500;
+            font-size: 1rem;
             font-style: normal;
-            font-weight: 600;
+            font-weight: 400;
+            line-height: 1.5rem;
+        }
+
+        .mark {
+            max-width: 100%;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            padding: 0.25rem 0.5rem;
+            text-align: center;
+            font-size: 0.875rem;
+            font-weight: 500;
             line-height: 1.25rem;
         }
     }
+}
 
-    .add-label {
-        padding: 0;
-        padding: 0.25rem 0.5rem;
+.add {
+    color: $gray-700;
+    text-align: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.25rem;
+
+    &.white {
+        padding: 0.375rem;
+    }
+}
+
+hr {
+    border-top: 1px solid $gray-200;
+}
+
+.attachment-checklist {
+    gap: 0.75rem;
+}
+
+footer {
+    justify-content: flex-end;
+    border-top: 1px solid $gray-200;
+
+    .save {
+        padding: 0.625rem 1rem;
         font-size: 0.875rem;
-        font-weight: 500;
+        font-style: normal;
+        font-weight: 600;
         line-height: 1.25rem;
-        color: $gray-700;
-        background-color: $gray-100;
-
-        &:focus {
-            background-color: #fff;
-        }
     }
+}
 
-    .check-list, .attachments {
-        gap: 0.75rem;
+.add-label {
+    padding: 0;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.25rem;
+    color: $gray-700;
+    background-color: $gray-100;
 
-        .title {
-            color: $gray-900;
-            font-size: 1rem;
-            font-weight: 500;
-            line-height: 1.5rem;
-        }
+    &:focus {
+        background-color: #fff;
     }
+}
+
+.check-list,
+.attachments {
+    gap: 0.75rem;
+
+    .title {
+        color: $gray-900;
+        font-size: 1rem;
+        font-weight: 500;
+        line-height: 1.5rem;
+    }
+}
 </style>

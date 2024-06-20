@@ -9,6 +9,13 @@ const project = useProjectStore()
   <header class="column">
     <div class="path-indicator">
       <div class="path-element">
+        <nuxt-link :to="`/`" class="name main-page">Главная</nuxt-link>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M5.83337 18.3333L14.1667 1.66667" stroke="#D0D5DD" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="path-element">
         <nuxt-link :to="`/team/${project.teams[0]?.id}`" class="name">{{project.teams[0]?.name}}</nuxt-link>
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
           <path d="M5.83337 18.3333L14.1667 1.66667" stroke="#D0D5DD" stroke-width="2" stroke-linecap="round"
@@ -81,6 +88,11 @@ const project = useProjectStore()
   .path-element {
     align-items: center;
     padding: 0.62rem 0;
+
+    .main-page{
+      color: $blue-600 !important;
+      font-weight: 700;
+    }
 
     svg {
       margin: 0 0.25rem;

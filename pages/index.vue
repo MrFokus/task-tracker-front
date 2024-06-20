@@ -39,7 +39,7 @@ let isCreateProject = ref(false)
     </ModalBase>
     <main class="padding-page">
         <TitleBase title="Главная"
-            description="Здесь вы можете управлять лмчными проектами или командами, в которых состоите.">
+            description="Здесь вы можете управлять личными проектами или командами, в которых состоите.">
             <div v-out-click="()=>isSelectCreate=false" style="position: relative; height: fit-content; width: fit-content;" class="btn-container">
                 <button @click="isSelectCreate = true" class="blue add-team">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -62,7 +62,7 @@ let isCreateProject = ref(false)
                 </ul>
             </div>
         </TitleBase>
-        <EmptyContent v-if="teams && teams.length==0" description="Пока ничего нет. <br> Создайте личный проект или команду!" preview="@/assets/img/empty-emoji.png"></EmptyContent>
+        <EmptyContent v-if="teams && teams.length==0" description="Пока ничего нет. <br> Но вы можете создать собственную команду команду!" preview="@/assets/img/empty-emoji.png"></EmptyContent>
         <div v-else class="content-main-page">
             <!-- <section class="personal-projects white-block">
                 <div class="title-container">

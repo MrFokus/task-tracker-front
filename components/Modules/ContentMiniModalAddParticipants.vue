@@ -49,98 +49,100 @@ function addUser(user: any) {
 </template>
 
 <style lang="scss" scoped>
-    header {
-        width: 100%;
-        padding: 0.125rem;
-        gap: 0.62rem;
-        align-items: center;
+header {
+    width: 100%;
+    padding: 0.125rem;
+    gap: 0.62rem;
+    align-items: center;
 
-        button {
-            padding: 0.375rem;
+    button {
+        padding: 0.375rem;
 
-            &:disabled {
-                opacity: 0;
-            }
-
-        }
-
-        .name-chapter {
-            width: 100%;
-            text-align: center;
-            color: $gray-500;
-            text-align: center;
-            font-family: Inter;
-            font-size: 0.875rem;
-            font-style: normal;
-            font-weight: 500;
-            line-height: 1.25rem;
+        &:disabled {
+            opacity: 0;
         }
 
     }
 
-    .add-participants {
+    .name-chapter {
         width: 100%;
-        gap: 0.25rem;
-        max-height: 14rem;
-        overflow: auto;
+        text-align: center;
+        color: $gray-500;
+        text-align: center;
+        font-family: Inter;
+        font-size: 0.875rem;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 1.25rem;
+    }
 
-        li {
-            width: 100%;
+}
+
+.add-participants {
+    width: 100%;
+    gap: 0.25rem;
+    max-height: 14rem;
+    overflow: auto;
+
+    li {
+        width: 100%;
+    }
+
+    .user-container {
+        align-items: center;
+        gap: 1rem;
+
+        img {
+            border-radius: 100%;
+            width: 2rem;
+            height: 2rem;
         }
+    }
 
-        .user-container {
-            align-items: center;
-            gap: 1rem;
-            img {
-                border-radius: 100%;
-                width: 2rem;
-                height: 2rem;
-            }
-        }
+    .user {
+        max-width: 100%;
+        justify-content: space-between;
+        border-radius: 0.625rem;
 
-        .user {
-            justify-content: space-between;
-            border-radius: 0.625rem;
-
-            &:hover {
-                background-color: $gray-100;
-            }
-
-            width: 100%;
-            max-width: 100%;
-            padding: 0.375rem 0.5rem;
-            gap: 0.875rem;
-            align-items: center;
+        .user-name {
             text-overflow: ellipsis;
             white-space: nowrap;
             overflow: hidden;
+            max-width: 90%;
+            color: $gray-500;
+            font-family: Inter;
+            font-size: 1rem;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 1.5rem;
+        }
 
-            svg {
-                min-width: fit-content;
-            }
+        &:hover {
+            background-color: $gray-100;
+        }
 
-            .name-container {
-                // display: grid;
-                // grid-template-columns: auto 1fr 1fr;
-                gap: 0.5rem;
-                align-items: center;
-                max-width: 100%;
-                width: 100%;
+        width: 100%;
+        max-width: 100%;
+        padding: 0.375rem 0.5rem;
+        gap: 0.875rem;
+        align-items: center;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
 
-                .user-name {
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    max-width: 80%;
-                    color: $gray-500;
-                    font-family: Inter;
-                    font-size: 1rem;
-                    font-style: normal;
-                    font-weight: 500;
-                    line-height: 1.5rem;
-                }
+        svg {
+            min-width: fit-content;
+        }
 
-            }
+        .user-container {
+            // display: grid;
+            // grid-template-columns: auto 1fr 1fr;
+            gap: 0.5rem;
+            align-items: center;
+            max-width: 80%;
+            width: 100%;
+
         }
     }
+}
 </style>

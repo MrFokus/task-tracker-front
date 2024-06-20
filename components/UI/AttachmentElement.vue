@@ -1,5 +1,19 @@
 <script setup lang="ts">
+const props = defineProps<{
+    file:any
+}>()
 
+const emit = defineEmits<{
+    delete:[]
+}>()
+
+async function deletefile(id:number) {
+    let res = await useMyFetch('/attachment/' + id, {
+        method:"DELETE"
+    })
+    emit('delete')
+    
+}
 </script>
 
 <template>
@@ -10,16 +24,16 @@
                 stroke="#2E90FA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
         <p class="file-name">
-            ТЗ от Аналитикого отдела
+            {{ file.name }}
         </p>
         <div class="actions">
-            <button class="white">
+            <a target="_blank" :href="file.path" :download="file.name" class="white">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <path d="M14 14H2M12 7.33333L8 11.3333M8 11.3333L4 7.33333M8 11.3333V2" stroke="#667085"
                         stroke-width="1.67" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
-            </button>
-            <button class="white">
+            </a>
+            <button @click="deletefile(file.id)" class="white">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <path
                         d="M10.6667 3.99998V3.46665C10.6667 2.71991 10.6667 2.34654 10.5213 2.06133C10.3935 1.81044 10.1895 1.60647 9.93865 1.47864C9.65344 1.33331 9.28007 1.33331 8.53333 1.33331H7.46667C6.71993 1.33331 6.34656 1.33331 6.06135 1.47864C5.81046 1.60647 5.60649 1.81044 5.47866 2.06133C5.33333 2.34654 5.33333 2.71991 5.33333 3.46665V3.99998M2 3.99998H14M12.6667 3.99998V11.4666C12.6667 12.5868 12.6667 13.1468 12.4487 13.5746C12.2569 13.951 11.951 14.2569 11.5746 14.4487C11.1468 14.6666 10.5868 14.6666 9.46667 14.6666H6.53333C5.41323 14.6666 4.85318 14.6666 4.42535 14.4487C4.04903 14.2569 3.74307 13.951 3.55132 13.5746C3.33333 13.1468 3.33333 12.5868 3.33333 11.4666V3.99998"
@@ -66,7 +80,7 @@
     .actions {
         gap: 0.5rem;
 
-        button {
+        button,a {
             padding: 0.5rem;
         }
     }

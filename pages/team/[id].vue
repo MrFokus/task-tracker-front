@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import ContentModalCreateProject from '~/components/Modules/ContentModalCreateProject.vue';
 import EmptyContent from '~/components/UI/EmptyContent.vue';
+import ModalBase from '~/components/UI/ModalBase.vue';
 import ProjectCard from '~/components/UI/ProjectCard.vue';
 import TitleBase from '~/components/UI/TitleBase.vue';
 
@@ -18,17 +20,21 @@ async function getTeam() {
 }
 await getTeam()
 
+const isCreateProject = ref(false)
 
 </script>
 
 <template>
+    <ModalBase @close="() => { isCreateProject = false}" v-if="isCreateProject">
+        <ContentModalCreateProject @close="isCreateProject = false"></ContentModalCreateProject>
+    </ModalBase>
     <main class="padding-page">
         <TitleBase :title="team.name"
             description="Здесь вы можете управлять командой и отслеживать проекты команды."
             :link-back="{ name: 'Вернуться назад на главную', path: '/' }">
             <div class="team-managements">
                 <button class="settings-team white">Управлять командой</button>
-                <LazyUIListParticipants :list="team.participatesTeam.map((el:any) => ({name:el?.user.name}))??[]" class="list-participants"></LazyUIListParticipants>
+                <LazyUIListParticipants :list="team.participatesTeam.map((el:any) => ({name:el?.user.name, photo:el?.user.photo}))??[]" class="list-participants"></LazyUIListParticipants>
             </div>
         </TitleBase>
         <hr>
@@ -70,7 +76,7 @@ await getTeam()
                         </button>
 
                     </div>
-                    <button class="blue add-project">
+                    <button @click="isCreateProject = true" class="blue add-project">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
                             <path d="M10.0001 4.16667V15.8333M4.16675 10H15.8334" stroke="white" stroke-width="1.67"
                                 stroke-linecap="round" stroke-linejoin="round" />
@@ -79,7 +85,7 @@ await getTeam()
                     </button>
                 </div>
             </div>
-            <div v-if="team.projects" class="projects">
+            <div v-if="team.projects.length" class="projects">
                 <ProjectCard :photo="project.photo" :id="project.id" :name="project.name" v-for="project in team.projects"></ProjectCard>
             </div>
             <EmptyContent v-else description="Проектов пока что нет. <br> Вы можете создать первый проект команды!"></EmptyContent>
