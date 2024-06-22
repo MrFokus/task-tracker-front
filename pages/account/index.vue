@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import TitleBase from '~/components/UI/TitleBase.vue';
+
 let user = await useMyFetch('/user')
 const formData = ref({
     name: '',

@@ -1,17 +1,26 @@
 <script setup lang="ts">
 import ContentModalCreateProject from '~/components/Modules/ContentModalCreateProject.vue';
+import ContentModalEditTeam from '~/components/Modules/ContentModalEditTeam.vue';
 import EmptyContent from '~/components/UI/EmptyContent.vue';
 import ModalBase from '~/components/UI/ModalBase.vue';
 import ProjectCard from '~/components/UI/ProjectCard.vue';
 import TitleBase from '~/components/UI/TitleBase.vue';
+import { useUserStore } from '~/store/user';
 
 const route = useRoute()
 const team = ref()
+const user = useUserStore().user
+const myRole = ref()
+const isEditTeam = ref(false)
 async function getTeam() {
     try {
         let res = await useMyFetch(`/team/${route.params.id}`)
         if (res) {
             team.value = res
+            console.log(user.id);
+            myRole.value = team.value.participatesTeam.find(el=> el.user.id === user.id)
+            console.log(myRole.value);
+            
         }        
     }
     catch (e) {
@@ -20,20 +29,28 @@ async function getTeam() {
 }
 await getTeam()
 
+console.log(team);
+
+
 const isCreateProject = ref(false)
 
 </script>
 
 <template>
     <ModalBase @close="() => { isCreateProject = false}" v-if="isCreateProject">
-        <ContentModalCreateProject @close="isCreateProject = false"></ContentModalCreateProject>
+        <ContentModalCreateProject :team-id="team.id" @close="isCreateProject = false"></ContentModalCreateProject>
+    </ModalBase>
+    <ModalBase @close="() => { isEditTeam = false}" v-if="isEditTeam">
+        <ContentModalEditTeam @close="isEditTeam = false" @update="getTeam" :team="team">
+
+        </ContentModalEditTeam>
     </ModalBase>
     <main class="padding-page">
         <TitleBase :title="team.name"
             description="Здесь вы можете управлять командой и отслеживать проекты команды."
             :link-back="{ name: 'Вернуться назад на главную', path: '/' }">
             <div class="team-managements">
-                <button class="settings-team white">Управлять командой</button>
+                <button v-if="myRole.role.id == 1 || myRole.role.id == 2" @click="isEditTeam = true" class="settings-team white">Управлять командой</button>
                 <LazyUIListParticipants :list="team.participatesTeam.map((el:any) => ({name:el?.user.name, photo:el?.user.photo}))??[]" class="list-participants"></LazyUIListParticipants>
             </div>
         </TitleBase>

@@ -8,6 +8,7 @@ export const useUserStore = defineStore('user', {
         async getUser() {
             const access_token = useCookie('access_token')
             let user = await useMyFetch<{
+                id:number,
                 name: string,
                 mail: string,
                 photo: string

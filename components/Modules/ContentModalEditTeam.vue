@@ -6,9 +6,13 @@ import type { ITeamParticipates } from '~/interfaces/team';
 import noUserProfile from '~/assets/img/no-user-profile.svg'
 
 const emit = defineEmits<{
-    close: []
+    close: [],
+    update: []
 }>()
 
+const props = defineProps<{
+    team: any
+}>()
 const searchUser = ref('')
 const teamName = ref('')
 const listSelectRole = ref(await useMyFetch<{ id: number, name: string, nameRu: string }[] | undefined>('/role'))
@@ -36,6 +40,23 @@ function addPeople(user: User) {
 }
 
 
+watch(() => props.team, () => {
+    teamName.value = props.team.name;
+    listPeople.value = props.team.participatesTeam.map((part: any) => {
+        console.log(part.role.id);
+
+        return {
+            id: part.user.id,
+            login: part.user.login,
+            mail: part.user.mail,
+            name: part.user.name,
+            photo: part.user.photo ? part.user.photo : undefined,
+            role: part.role.id
+        }
+    })
+
+
+}, { immediate: true, deep: true })
 
 function deletePeople(index: number) {
     if (listPeople.value.length > 1) {
@@ -80,11 +101,10 @@ function setRole(indexRole: number, indexUser: number) {
     }
 }
 
-
 async function createTeam() {
     try {
-        let res = await useMyFetch<ITeamParticipates>('team', {
-            method: 'POST',
+        let res = await useMyFetch<ITeamParticipates>('team/' + props.team.id, {
+            method: 'PATCH',
             body: {
                 name: teamName.value,
                 participates: listPeople.value.map(el => ({ id: el.id, role: el.role }))
@@ -93,7 +113,8 @@ async function createTeam() {
         console.log(res);
 
         if (res) {
-            navigateTo(`/team/${res.id}`)
+            emit('update')
+            emit('close')
         }
     }
     catch (e: any) {
@@ -114,8 +135,8 @@ watch(searchUser, async () => {
 <template>
     <form @submit.prevent="createTeam" class="white-window column">
         <header class="modal-block">
-            <p class="modal-name">Создание команды</p>
-            <button class="close" type="button" @click="emit('close')">
+            <p class="modal-name">Редактировние команды</p>
+            <button type="button" class="close" @click="emit('close')">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
                     <path d="M11 1L1 11M1 1L11 11" stroke="#667085" stroke-width="1.66667" stroke-linecap="round"
                         stroke-linejoin="round" />
@@ -143,8 +164,8 @@ watch(searchUser, async () => {
                         <img class="profile-photo" :src="user.photo ?? noUserProfile" alt="">
                         <p class="login">{{ user.login }}</p>
                         <p class="full-name">{{ user.name }}</p>
-                        <Select v-if="listSelectRole" class="select-role" :selectedIndex="user.role-1"  @select="setRole($event, index)"
-                            :list-select="listSelectRole.map(el => el.nameRu)">
+                        <Select v-if="listSelectRole" class="select-role" :selectedIndex="user.role - 1"
+                            @select="setRole($event, index)" :list-select="listSelectRole.map(el => el.nameRu)">
                         </Select>
                         <button type="button" @click="deletePeople(index)" class="white delete-user">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"
@@ -159,7 +180,7 @@ watch(searchUser, async () => {
                 </ul>
             </div>
             <footer>
-                <button type="submit" class="blue">Создать</button>
+                <button type="submit" class="blue">Сохранить</button>
             </footer>
         </div>
     </form>

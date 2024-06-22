@@ -14,7 +14,13 @@ export default defineNuxtConfig({
           additionalData: '@use "@/assets/styles/_variable.scss" as *; @import "@/assets/styles/_variable.scss";'
         }
       }
-    }
+    },
+    vue:{
+      script:{
+        defineModel:true,
+        propsDestructure:true,
+      },
+    },
   },
   runtimeConfig: {
     public:{

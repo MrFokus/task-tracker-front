@@ -10,10 +10,17 @@ const emit = defineEmits<{
     close: []
 }>()
 
+const props = defineProps<{
+    teamId?:number,
+}>()
+
 const team = ref<ITeamBase>({
     id: -1,
     name: ''
 })
+if (props.teamId) {
+    team.value.id=props.teamId
+}
 const listSelectRole = ref(await useMyFetch<{ id: number, name: string, nameRu: string }[] | undefined>('/role'))
 const projectName = ref()
 const listPeople = ref<IAddUser[]>([])
@@ -109,7 +116,7 @@ watch(() => team.value.name, async () => {
                 <p class="input-name">Название проекта</p>
                 <input v-model="projectName" placeholder="Введите название проекта" type="text">
             </div>
-            <div class="input-container column">
+            <div v-if="!teamId" class="input-container column">
                 <p class="input-name">Команда</p>
                 <Search v-model:is-search="isSearchTeam" v-model="team.name"
                     :attributes="{ placeholder: 'Введите название команды' }">
