@@ -42,8 +42,8 @@ const project = useProjectStore()
         </div>
       </div>
       <div class="actions">
-        <button class="archive clear">Показать архив</button>
-        <button class="white">Фильтры</button>
+        <button class="white">Показать архив</button>
+        <!-- <button class="white">Фильтры</button> -->
       </div>
     </div>
   </header>

@@ -10,7 +10,6 @@ import { useUserStore } from '~/store/user';
 
 
 const userStore = useUserStore()
-
 const teams = ref()
 async function getTeams() {
     try {
@@ -32,8 +31,7 @@ let isCreateProject = ref(false)
 
 <template>
     <ModalBase @close="() => { isCreateTeam = false;  isCreateProject = false}" v-if="isCreateTeam || isCreateProject">
-        <ContentModalCreateTeam v-if="isCreateTeam" @close="isCreateTeam = false">
-            
+        <ContentModalCreateTeam v-if="isCreateTeam" @close="isCreateTeam = false"> 
         </ContentModalCreateTeam>
         <ContentModalCreateProject v-else-if="isCreateProject" @close="isCreateProject = false"></ContentModalCreateProject>
     </ModalBase>

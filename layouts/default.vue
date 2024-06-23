@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Header from "~/components/UI/Header.vue";
+import Message from "~/components/UI/Message.vue";
 </script>
 
 <template>
@@ -7,6 +8,7 @@ import Header from "~/components/UI/Header.vue";
   <slot>
 
   </slot>
+  <Message></Message>
 </template>
 
 

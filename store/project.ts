@@ -29,7 +29,13 @@ export const useProjectStore = defineStore('project', {
             }
             this.teams = project.teams
             let res = await useMyFetch('/team/users', { query: { teamId: this.teams[0].id } })
-            this.users = res.map(el => el.user)
+            console.log(res);
+            
+            this.users = res.map(el =>{ 
+                console.log({...el.user, role:el.role});
+                
+                return{...el.user, role:el.role}
+            })
             this.marks = await useMyFetch('/mark', {
                 query: {
                     projectId: +projectId

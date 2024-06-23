@@ -121,7 +121,6 @@ watch(() => team.value.name, async () => {
                 <Search v-model:is-search="isSearchTeam" v-model="team.name"
                     :attributes="{ placeholder: 'Введите название команды' }">
                     <li @click="selectTeam(team)" class="team-search" v-for="team in listSearchTeam">
-                        <img class="team-photo" :src="team?.photo ?? noUserProfile" alt="">
                         <p class="team-name">{{ team?.name }}</p>
                     </li>
                 </Search>

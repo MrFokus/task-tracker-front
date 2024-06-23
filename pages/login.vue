@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useMyFetch } from "~/composables/myFetch";
+import { useErrorStore } from "~/store/error";
 definePageMeta({
     layout: undefined
 })
@@ -17,11 +18,26 @@ async function login() {
         password: credential.value.password
       },
     })
+    if(res){
     access_token.value = 'Bearer ' + res?.access_token
     await navigateTo('/')
+    }
   }
   catch (e) {
     console.error(e);
+    if(e.statusCode == 400){
+      console.log('dhdhdhdhdh');
+      
+      useErrorStore().setMessages({type:'error',message:'Не все поля заполнены'})
+    }
+    else if(e.statusCode == 401){
+      useErrorStore().setMessages({type:'error',message:'Логин или пароль не верны'})
+    }
+    else{
+      useErrorStore().setMessages({type:'error',message:'Ошибка сервера'})
+
+    }
+    
   }
 
 }

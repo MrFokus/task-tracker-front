@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import EmptyContent from '../UI/EmptyContent.vue';
 import ListParticipants from '../UI/ListParticipants.vue';
 import ProjectCard from '../UI/ProjectCard.vue';
 
@@ -35,25 +36,27 @@ await getProjects()
                 {{teamName}}
             </p>
             <div class="btns">
-                <button class="clear managment">Управлять</button>
                 <nuxt-link :to="`team/${teamId}`" class="white">
                     Показать все проекты
                 </nuxt-link>
             </div>
         </div>
         <ListParticipants :list="users" class="list-participants">
-            <button class="white add-paticipant">
+            <!-- <button class="white add-paticipant">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M10.0001 4.16667V15.8333M4.16675 10H15.8334" stroke="#667085" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
-            </button>
+            </button> -->
         </ListParticipants>
-        <div class="last-projects-container">
+        <div v-if="projects.length > 0" class="last-projects-container">
             <p class="title">Последние проекты</p>
-            <div v-crop-content class="last-projects">
+            <div  v-crop-content class="last-projects">
                 <ProjectCard :photo="project.photo" :id="project.id" :name="project.name" v-for="project in projects"></ProjectCard>
             </div>
+        </div>
+        <div v-else>
+            <EmptyContent class="no-projects" description="Пока что проектов нет"/>
         </div>
     </div>
 </template>
@@ -98,7 +101,8 @@ await getProjects()
 
     .list-participants {
         width: 100%;
-        height: 4rem;
+        height: 100%;
+        max-height: 4rem;
         background-color: $gray-100;
         border-radius: 0.75rem;
     }
@@ -135,6 +139,11 @@ await getProjects()
 
         .last-projects {
             gap: .75rem;
+        }
+    }
+    .no-projects:deep(){
+        .empty-emoji{
+            width: 8rem;
         }
     }
 </style>

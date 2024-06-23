@@ -4,6 +4,7 @@ import ContentModalViewCard from '~/components/Modules/ContentModalViewCard.vue'
 import ColumnKanban from '~/components/UI/ColumnKanban.vue';
 import ModalBase from '~/components/UI/ModalBase.vue';
 import { useProjectStore } from '~/store/project';
+import { useUserStore } from '~/store/user';
 
 definePageMeta({
     layout: 'project'
@@ -29,7 +30,10 @@ const newColumnInput = ref('')
 const projectStore = useProjectStore()
 const project = ref()
 const openTask = ref()
+
 project.value = await projectStore.getProject(route.params.id)
+
+const myRole = computed(()=>project?.value?.users.find(u=>u.id == useUserStore()?.user?.id).role.id)
 
 
 if (!project) {
@@ -111,10 +115,10 @@ $io.on('error', (e) => {
         </ModalBase>
         <div v-if="project.groups.length" class="kanban">
             <ColumnKanban @open-task="openTask = $event" :cards="project?.tasks?.filter(t=>t.column.id === column.id)" :key="column.id" @delete="deleteColumn" @create-card="createCard" :id="column.id" :name="column.name"
-                v-for="column in project.groups"></ColumnKanban>
+                v-for="column in project.groups.filter(c=>c.name!=='Архив')"></ColumnKanban>
             <div class="group-kanban column">
                 <div class="container-column-name">
-                    <button @click="isCreateColumn = true" class="grey-button">
+                    <button v-if="myRole<3" @click="isCreateColumn = true" class="grey-button">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
                             <path d="M10.0001 4.16666V15.8333M4.16675 9.99999H15.8334" stroke="#667085"
                                 stroke-width="1.67" stroke-linecap="round" stroke-linejoin="round" />

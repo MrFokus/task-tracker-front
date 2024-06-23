@@ -1,7 +1,8 @@
 <script setup lang="ts">
 const props = defineProps<{
     description: string,
-    preview?:string
+    preview?:string,
+    indicator?:boolean
 }>()
 </script>
 

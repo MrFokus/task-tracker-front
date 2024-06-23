@@ -2,6 +2,7 @@
 export const useMyFetch = async<Type> (request:string, opts?:any)=>{
     const config = useRuntimeConfig()
     const accessToken = useCookie('access_token')
+    try{
     const res = await $fetch<Type>(request, {
         ...opts,
         baseURL: config.public.baseUrl,
@@ -9,4 +10,9 @@ export const useMyFetch = async<Type> (request:string, opts?:any)=>{
         immediate:true,
     })
     return res
+}
+catch (e){
+    console.error(e);
+    throw e
+}
 }
