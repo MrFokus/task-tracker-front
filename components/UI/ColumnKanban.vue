@@ -6,7 +6,8 @@ import { useProjectStore } from '~/store/project';
 const props = defineProps<{
     id: number,
     name: string,
-    cards: any[]
+    cards: any[],
+    role?:number
 }>()
 
 const emit = defineEmits<{
@@ -15,11 +16,10 @@ const emit = defineEmits<{
         name: string,
     }],
     delete: [number],
-    openTask: [number]
+    openTask: [number],
 }>()
 
 async function swapCard() {
-    console.log('sfgsfjgnskgsjgnsk');
     
     let res = await useMyFetch('/task/swap-group', {
         method: "PUT",
@@ -35,7 +35,7 @@ async function swapCard() {
 
 <template>
     <div @dragover.prevent @drop.prevent="swapCard" :class="['group-kanban', 'column', { 'drag': useProjectStore().drag!==undefined }]">
-        <div :class="['container-column-name', DEFAULT_COLUMN[name] ? 'no-delete' : '']">
+        <div :class="['container-column-name', DEFAULT_COLUMN[name] ? 'no-delete' : '', role && role>2?'no-delete':'']">
             <div :style="{ backgroundColor: DEFAULT_COLUMN[name]?.background ?? 'transparent', outline: DEFAULT_COLUMN[name] ? '' : '1px solid #D0D5DD' }"
                 :class="['column-name']">
                 <img :src="DEFAULT_COLUMN[name]?.icon ?? '/dashed-icon.svg'" alt="">

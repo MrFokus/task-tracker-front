@@ -4,6 +4,7 @@ import Search from '../UI/Search.vue';
 import Select from '../UI/Select.vue';
 import type { ITeamParticipates } from '~/interfaces/team';
 import noUserProfile from '~/assets/img/no-user-profile.svg'
+import { useUserStore } from '~/store/user';
 
 const emit = defineEmits<{
     close: []
@@ -34,6 +35,9 @@ function addPeople(user: User) {
     return
 
 }
+onMounted(()=>{
+    addPeople(useUserStore().user)
+})
 
 
 

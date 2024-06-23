@@ -12,6 +12,7 @@ export const useUserStore = defineStore('user', {
                 name: string,
                 mail: string,
                 photo: string
+                login:string,
             }>('/user')
             this.user = user
             console.log(this.user);

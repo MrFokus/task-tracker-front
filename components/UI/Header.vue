@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const user = ref()
 onMounted(async () => {
-   user.value = await useMyFetch('/user')
+    user.value = await useMyFetch('/user')
 })
 const route = useRoute()
 
@@ -13,7 +13,7 @@ watch(() => route.name, async () => {
 </script>
 
 <template>
-    <header v-if="route.name!=='login' && route.name!=='register' " class="padding-page">
+    <header v-if="route.name !== 'login' && route.name !== 'register'" class="padding-page">
         <nuxt-link to="/" class="logo">
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
                 <path
@@ -33,7 +33,10 @@ watch(() => route.name, async () => {
                         stroke="#667085" stroke-width="1.67" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
             </NuxtLink> -->
-            <img :src="user?.photo ?? '/no-user-profile.svg'" alt="">
+
+            <nuxt-link to="account">
+                <img :src="user?.photo ?? '/no-user-profile.svg'" alt="">
+            </nuxt-link>
         </div>
     </header>
 </template>
@@ -50,10 +53,12 @@ header {
     border-bottom: 1px solid var(--Gray-200, #EAECF0);
     background: var(--White, #FFF);
     justify-content: space-between;
+
     .logo {
         display: flex;
         align-items: center;
         gap: 0.62rem;
+
         svg {
             width: 2.5rem;
             aspect-ratio: 1/1;
@@ -62,7 +67,7 @@ header {
         .name {
             color: $gray-900;
             /* Text xl/Semibold */
-            font-family: Inter,sans-serif;
+            font-family: Inter, sans-serif;
             font-size: 1.25rem;
             font-style: normal;
             font-weight: 600;
@@ -70,17 +75,20 @@ header {
             /* 150% */
         }
     }
-    .profile-header{
+
+    .profile-header {
         gap: 1rem;
         align-items: center;
-        .settings{
-            padding:0.62rem;
+
+        .settings {
+            padding: 0.62rem;
         }
-        img{
-          width:2.5rem;
-          height: 2.5rem;
-          border-radius:50%;
-          aspect-ratio: 1/1;
+
+        img {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            aspect-ratio: 1/1;
         }
     }
 }

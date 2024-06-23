@@ -1,8 +1,12 @@
 <script setup lang="ts">
+import ContentArchive from '~/components/Modules/ContentArchive.vue';
 import ListParticipants from '~/components/UI/ListParticipants.vue';
+import ModalBase from '~/components/UI/ModalBase.vue';
 import { useProjectStore } from '~/store/project';
 
 const project = useProjectStore()
+
+const isOpenArchive = ref(false)
 </script>
 
 <template>
@@ -42,11 +46,14 @@ const project = useProjectStore()
         </div>
       </div>
       <div class="actions">
-        <button class="white">Показать архив</button>
+        <button @click = 'isOpenArchive = true' class="white">Показать архив</button>
         <!-- <button class="white">Фильтры</button> -->
       </div>
     </div>
   </header>
+  <ModalBase @close="isOpenArchive= false" v-if="isOpenArchive">
+    <ContentArchive @close ="isOpenArchive = false" :id="project.groups.find(g=>g.name == 'Архив')?.id" :cards="project.tasks"></ContentArchive>
+  </ModalBase>
   <slot>
 
   </slot>

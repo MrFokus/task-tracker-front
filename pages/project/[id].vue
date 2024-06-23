@@ -100,21 +100,21 @@ $io.on('error', (e) => {
         <ModalBase v-if="isCreateColumn" @close="isCreateColumn = false">
             <form @submit.prevent="" class="create-column white-block column">
                 <header>
-                    <p>Создание колонки</p>
+                    <p>Создание этапа</p>
                 </header>
                 <!-- <hr> -->
                 <div class="content-form column">
-                    <input v-model="newColumnInput" placeholder="Введите название колонки" type="text">
+                    <input v-model="newColumnInput" placeholder="Введите название этапа" type="text">
                     <hr>
                     <div class="btns">
                         <button @click="isCreateColumn = false" class="white">Отмена</button>
-                        <button @click="createColumn" class="blue">Создать колонку</button>
+                        <button @click="createColumn" class="blue">Создать этап</button>
                     </div>
                 </div>
             </form>
         </ModalBase>
         <div v-if="project.groups.length" class="kanban">
-            <ColumnKanban @open-task="openTask = $event" :cards="project?.tasks?.filter(t=>t.column.id === column.id)" :key="column.id" @delete="deleteColumn" @create-card="createCard" :id="column.id" :name="column.name"
+            <ColumnKanban :role="myRole" @open-task="openTask = $event" :cards="project?.tasks?.filter(t=>t.column.id === column.id)" :key="column.id" @delete="deleteColumn" @create-card="createCard" :id="column.id" :name="column.name"
                 v-for="column in project.groups.filter(c=>c.name!=='Архив')"></ColumnKanban>
             <div class="group-kanban column">
                 <div class="container-column-name">
@@ -123,7 +123,7 @@ $io.on('error', (e) => {
                             <path d="M10.0001 4.16666V15.8333M4.16675 9.99999H15.8334" stroke="#667085"
                                 stroke-width="1.67" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
-                        Добавить колонку
+                        Добавить этап
                     </button>
                 </div>
             </div>

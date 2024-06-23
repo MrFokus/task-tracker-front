@@ -6,18 +6,22 @@ import ContentMiniModalAddParticipants from './ContentMiniModalAddParticipants.v
 import ContentMiniModalAddColumn from './ContentMiniModalAddColumn.vue';
 import { DEFAULT_COLUMN } from '~/constants/project';
 import TaskCheckList from '../UI/TaskCheckList.vue';
+import DropFile from '../UI/DropFile.vue';
+import AttachmentElement from '../UI/AttachmentElement.vue';
+import AttachmentByCreate from '../UI/AttachmentByCreate.vue';
 
 const project = useProjectStore()
 const props = defineProps<{
     projectName: string,
-    projectId: number,
     group?: any,
+    projectId:number,
 }>()
 
 const isSetMark = ref(false)
 const isSetParticipants = ref(false)
 const isSetColumn = ref(false)
 const isAddCheckList = ref(false)
+const isAddAttachments = ref(false)
 
 const formData = ref({
     taskName: '',
@@ -27,9 +31,50 @@ const formData = ref({
     participants: [],
     group: props.group,
     checkList: [],
-    attachment: [],
+    attachments: [],
     label: ''
 })
+
+const files = ref([])
+// await getTask()
+async function saveTask () {
+    let res = await useMyFetch(`/task`, {
+        method: "POST",
+        body: {
+            projectId:props.projectId,
+            name: formData.value.taskName,
+            description: formData.value.description,
+            groupId: formData.value.group.id,
+            dateEnd: new Date(formData.value.dateEnd).toISOString(),
+            label: formData.value.label,
+            marks: formData.value.marks,
+            participants: formData.value.participants,
+            checkList: formData.value.checkList,
+        }
+    })
+    let files_res =await uploadFiles(files.value, res.id)
+    emit('close')
+
+}
+
+
+async function getTask() {
+
+    const task = await useMyFetch(`/task/${props.taskId}`)
+    if(task)
+    formData.value = {
+        taskName: task.name,
+        description: task.description,
+        dateEnd: task.dateEnd,
+        marks: task.marks,
+        participants: task.participants,
+        group: task.column,
+        checkList: task.subtasks,
+        attachments: task.attachments,
+        label: task.label
+    }
+}
+
 
 
 function setMark(marks: any[]) {
@@ -46,25 +91,19 @@ function textareaResize(e: any) {
     e.target.style.height = `${e.target.scrollHeight}px`;
 }
 
-async function saveTask() {
-    let res = await useMyFetch('/task', {
-        method: "POST",
-        body: {
-            name: formData.value.taskName,
-            description: formData.value.description,
-            projectId: props.projectId,
-            groupId: formData.value.group.id,
-            dateEnd: new Date(formData.value.dateEnd).toISOString(),
-            label: formData.value.label,
-            marks: formData.value.marks,
-            participants: formData.value.participants,
-            checkList: formData.value.checkList,
-            attachment: formData.value.attachment
-        }
+async function uploadFiles(files: File[],taskId:number) {
+    let file = new FormData()
+    console.log(files);
+
+    files.forEach(f => file.append('files', f))
+    let res = await useMyFetch('/task/upload/' + taskId, {
+        method: 'POST',
+        body: file
     })
-    emit('close')
-    
+    return res
+
 }
+
 </script>
 
 <template>
@@ -190,16 +229,22 @@ async function saveTask() {
                     </div>
                 </div>
             </section>
-            <hr>
-            <section class="attachment-checklist">
-                <button v-if="!isAddCheckList || !formData.checkList.length" @click="isAddCheckList = true"
-                    class="add grey">Добавить чеклист</button>
-                <button class="add grey">Прикрепить файлы</button>
+            <hr v-if="!formData.checkList?.length || !formData.attachments?.length">
+            <section v-if="!formData.checkList?.length || !formData.attachments?.length" class="attachment-checklist">
+                <button v-if="!formData.checkList.length" @click="isAddCheckList = true" class="add grey">Добавить
+                    чеклист</button>
+                <button v-if="!formData.attachments.length" @click="isAddAttachments = true" class="add grey">Прикрепить файлы</button>
             </section>
-            <hr v-if="isAddCheckList">
-            <section v-if="isAddCheckList" class="check-list column">
+            <hr v-if="formData.checkList.length">
+            <section v-if="formData.checkList.length || isAddCheckList" class="check-list column">
                 <p class="title">Чеклист</p>
                 <TaskCheckList v-model="formData.checkList" />
+            </section>
+            <hr v-if="formData.checkList?.length || formData.attachments?.length">
+            <section v-if="formData.attachments?.length || isAddAttachments" class="attachments column">
+                <p class="title">Вложения</p>
+               <AttachmentByCreate :name="file.name" v-for="file in files"></AttachmentByCreate>
+                <DropFile :multiple="true" @upload="files = $event"></DropFile>
             </section>
         </div>
         <footer class="modal-block">
@@ -418,7 +463,8 @@ footer {
     }
 }
 
-.check-list {
+.check-list,
+.attachments {
     gap: 0.75rem;
 
     .title {

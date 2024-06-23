@@ -18,6 +18,10 @@ let user = await useMyFetch('/user/'+route.params.id)
                 </div>
             </div>
             <div class="input-container column">
+                <p class="input-name">Логин</p>
+                <input disabled v-model="user.login" placeholder="Введите ваше имя" type="text">
+            </div>
+            <div class="input-container column">
                 <p class="input-name">Имя</p>
                 <input disabled v-model="user.name" placeholder="Введите ваше имя" type="text">
             </div>

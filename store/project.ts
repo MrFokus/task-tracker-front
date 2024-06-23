@@ -8,7 +8,7 @@ export const useProjectStore = defineStore('project', {
         groups: [],
         tasks: [],
         marks: [],
-        drag:undefined
+        drag:undefined,
     }),
 
     getters: {

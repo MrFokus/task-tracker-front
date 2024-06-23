@@ -50,7 +50,7 @@ const isCreateProject = ref(false)
             description="Здесь вы можете управлять командой и отслеживать проекты команды."
             :link-back="{ name: 'Вернуться назад на главную', path: '/' }">
             <div class="team-managements">
-                <button v-if="myRole.role.id == 1 || myRole.role.id == 2" @click="isEditTeam = true" class="settings-team white">Управлять командой</button>
+                <button v-if="myRole.role.id == 1" @click="isEditTeam = true" class="settings-team white">Управлять командой</button>
                 <LazyUIListParticipants :list="team.participatesTeam.map((el:any) => ({name:el?.user.name, photo:el?.user.photo}))??[]" class="list-participants"></LazyUIListParticipants>
             </div>
         </TitleBase>
